@@ -13,7 +13,7 @@ class Users
             'mobile_phone' => array('type' => 'varchar', 'constraint' => 100),
             'ubication' => array('type' => 'varchar', 'constraint' => 100),
             'birthday' => array('type' => 'varchar', 'constraint' => 100),
-            'is_registered' => array('type' => 'boolean', 'constraint' => 100),
+            'is_registered' => array('type' => 'boolean'),
             'id_rol' => array('type' => 'int', 'constraint' => 5)
         ), array('id'),
             true,
@@ -31,6 +31,9 @@ class Users
                     'on_delete' => 'CASCADE'
                 )
             ));
+
+        \DB::query("ALTER TABLE `users` ADD UNIQUE (`email`)")->execute();
+        \DB::query("ALTER TABLE `users` ADD UNIQUE (`mobile_phone`)")->execute();
     }
 
     function down()

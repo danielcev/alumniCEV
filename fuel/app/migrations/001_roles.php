@@ -11,6 +11,8 @@ class Roles
             'type' => array('type' => 'varchar', 'constraint' => 100),
 
         ), array('id'));
+
+        \DB::query("ALTER TABLE `roles` ADD UNIQUE (`type`)")->execute();
     }
 
     function down()
