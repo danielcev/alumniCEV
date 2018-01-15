@@ -42,9 +42,6 @@ class Model_Users extends Orm\Model
         'name' => array(
             'data_type' => 'varchar',
         ),
-        'lastnames' => array(
-            'data_type' => 'varchar',
-        ),
         'x' => array(
             'data_type' => 'varchar',
         ),

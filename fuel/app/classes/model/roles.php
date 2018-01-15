@@ -7,9 +7,9 @@ class Model_Roles extends Orm\Model
 	protected static $_properties = array('id','type');
 
 	protected static $_belongs_to = array(
-    'user' => array(
+    'users' => array(
         'key_from' => 'id_rol',
-        'model_to' => 'Model_User',
+        'model_to' => 'Model_Users',
         'key_to' => 'id',
         'cascade_save' => true,
         'cascade_delete' => false,
