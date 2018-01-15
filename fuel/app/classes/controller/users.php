@@ -5,14 +5,14 @@ use Firebase\JWT\JWT;
 
 class Controller_Users extends Controller_Rest
 {
-	 private $key = 'my_secret_key';
-   protected $format = 'json';
+	private $key = 'my_secret_key';
+    protected $format = 'json';
  
    function post_create()
    {
 
         try {
-            if (!isset($_POST['username']) || !isset($_POST['password']) || $_POST['username'] == "" || $_POST['password'] == "") 
+            if (!isset($_POST['email']) || !isset($_POST['password']) || $_POST['username'] == "" || $_POST['password'] == "") 
             {
 
               $this->createResponse(400, 'Parámetros incorrectos');
@@ -23,7 +23,7 @@ class Controller_Users extends Controller_Rest
             $password = $_POST['password'];
 
             if(!$this->userExists($username)){ //Si el usuario todavía no existe
-                $props = array('nombre' => $username, 'contraseña' => $password, 'id_rol' => 1);
+                $props = array('nombre' => $username, 'contraseña' => $password, 'id_rol' => 3);
 
                 $new = new Model_Usuarios($props);
                 $new->save();

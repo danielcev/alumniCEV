@@ -7,7 +7,8 @@ return array(
       'default' => 
       array(
         0 => '001_roles',
-        1 => '002_users',
+        1 => '002_privacity',
+        2 => '003_users',
       ),
     ),
     'module' => 
