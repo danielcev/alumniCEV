@@ -42,10 +42,10 @@ class Model_Users extends Orm\Model
         'name' => array(
             'data_type' => 'varchar',
         ),
-        'x' => array(
+        'lon' => array(
             'data_type' => 'varchar',
         ),
-        'y' => array(
+        'lat' => array(
             'data_type' => 'varchar',
         ),
     );
