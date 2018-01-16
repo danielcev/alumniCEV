@@ -52,6 +52,8 @@ class Users
         \DB::query("ALTER TABLE `users` ADD UNIQUE (`email`)")->execute();
         \DB::query("ALTER TABLE `users` ADD UNIQUE (`phone`)")->execute();
         \DB::query("ALTER TABLE `users` ADD UNIQUE (`username`)")->execute();
+        \DB::query("INSERT INTO `users` (`id`, `email`, `password`, `phone`, `username`, `birthday`, `is_registered`, `id_rol`, `id_privacity`, `group`, `description`, `photo`, `name`, `lon`, `lat`) VALUES (NULL, 'admin', 'admin', NULL, NULL, NULL, '1', '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL);")->execute();
+
     }
 
     function down()

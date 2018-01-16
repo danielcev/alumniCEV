@@ -2,7 +2,8 @@
 /**
  * The development database settings. These get merged with the global settings.
  */
-/*
+
+// LOCAL
 return array(
 	'default' => array(
 		'connection'  => array(
@@ -12,7 +13,8 @@ return array(
 		),
 	),
 );
-*/
+/*
+// PRODUCCION
 return array(
 	'default' => array(
 		'connection'  => array(
@@ -21,4 +23,4 @@ return array(
 			'password'   => '7y1RXtIMBc4ynUvz',
 		),
 	),
-);
+);*/

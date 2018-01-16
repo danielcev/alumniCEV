@@ -12,16 +12,16 @@ class Controller_Users extends Controller_Rest
 
         try {
 
-            if (/*!isset($_POST['email']) || !isset($_POST['password']) || */$_POST['password'] == "" || $_POST['email'] == "") 
+            if (empty($_POST['email']) || empty($_POST['password']) ) 
             {
 
-              $this->createResponse(400, 'Parámetros incorrectos');
+              return $this->createResponse(400, 'Parámetros incorrectos');
             }
 
             $email = $_POST['email'];
             $password = $_POST['password'];
 
-            if($this->userExists($email))
+            if($this->userNotRegistered($email))
             { 
                 $username = explode("@", $email)[0];
 
@@ -84,8 +84,63 @@ class Controller_Users extends Controller_Rest
         }      
     }
 
+    function post_insertUser()
+    {
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        // token no valido
+        $jwt = apache_request_headers()['Authorization'];
+
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+        // validar rol de admin
+        $user = $this->decodeToken();
+        if ($user->data->id_rol != 1) {
+            return $this->createResponse(401, 'No autorizado');
+        }
+        // falta parametro email
+        if (empty($_POST['email'])) {
+            return $this->createResponse(400, 'Falta parametro email ');
+        }
+        $email = $_POST['email'];
+        try {
+            // validar que no exista ese email en la bbdd
+            $userDB = Model_Users::find('first', array(
+               'where' => array(
+                   array('email', $email),
+                   ),
+            ));
+            if ($userDB != null) 
+            {
+                return $this->createResponse(400, 'El email ya existe');
+            }
+            // crear un nueov usuario
+            $newUser = new Model_Users(array('email' => $email,'is_registered'=> 0));
+            $newUser->save();
+            return $this->createResponse(200, 'Usuario insertado con exito');
+
+        } catch (Exception $e) 
+        {
+            return $this->createResponse(500, $e->getMessage());
+        }
+    }
+
     function get_login()
     {
+
+        if (empty($_GET['email']) || empty($_GET['password']) )
+        {
+            return $this->createResponse(400, 'Parámetros incorrectos');
+        }
 
         $email = $_GET['email'];
         $password = $_GET['password'];
@@ -99,6 +154,9 @@ class Controller_Users extends Controller_Rest
 
       	if($userDB != null){ //Si el usuario se ha logueado (existe en la BD)
 
+            if ($userDB['id_rol'] != 1) {
+                return $this->createResponse(401, 'No autorizado');
+            }
       		//Creación de token
       		$time = time();
       		$token = array(
@@ -106,17 +164,13 @@ class Controller_Users extends Controller_Rest
                 'data' => [ 
                 'id' => $userDB['id'],
                 'email' => $email,
-                'username' => $userDB['username'],
                 'password' => $password,
-                'id_rol' => $userDB['id_rol'],
-                'id_privacity' => $userDB['id_privacity'],
-                'group' => $userDB['group']
                 ]
             );
 
       		$jwt = JWT::encode($token, $this->key);
 
-            $this->createResponse(200, 'login correcto', ['token' => $jwt, 'user' => $user]);
+            return $this->createResponse(200, 'login correcto', ['token' => $jwt, 'user' => $email]);
 
         }else{
 
@@ -128,6 +182,11 @@ class Controller_Users extends Controller_Rest
     function post_login()
     {
         try {
+
+            if (empty($_POST['email']) || empty($_POST['password']) )
+            {
+                return $this->createResponse(400, 'Parámetros incorrectos');
+            }
             $email = $_POST['email'];
             $password = $_POST['password'];
 
@@ -186,22 +245,12 @@ class Controller_Users extends Controller_Rest
         
     }
 
-    function get_userToken()
+    function decodeToken()
     {
 
         $jwt = apache_request_headers()['Authorization'];
-
-        if($jwt != ""){
-            if($this->validateToken($jwt)){
-                $token = JWT::decode($jwt, $this->key , array('HS256'));
-
-                $this->createResponse(200, 'Usuario devuelto', $token->data);
-            }else{
-                $this->createResponse(400, 'No tienes permiso para realizar esta acción');
-            }
-        }else{
-          $this->createResponse(400, 'No tienes permiso para realizar esta acción');
-      }
+        $token = JWT::decode($jwt, $this->key , array('HS256'));
+        return $token;
     }
 
     function get_user()
@@ -290,7 +339,7 @@ class Controller_Users extends Controller_Rest
       }
     }
 
-    function userExists($email)
+    function userNotRegistered($email)
     {
 
         $userDB = Model_Users::find('first', array(
@@ -313,11 +362,13 @@ class Controller_Users extends Controller_Rest
 
         $username = $token->data->username;
         $password = $token->data->password;
+        $id = $token->data->id;
 
         $userDB = Model_Users::find('all', array(
             'where' => array(
                 array('username', $username),
-                array('password', $password)
+                array('password', $password),
+                array('id',$id)
                 )
             ));
 
