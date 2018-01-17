@@ -293,6 +293,32 @@ class Controller_Users extends Controller_Rest
         }
     }
 
+    function get_allusers()
+    {
+
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+
+        $jwt = apache_request_headers()['Authorization'];
+
+        // validar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+
+          $users = Model_Users::find('all');
+
+          $this->createResponse(200, 'Usuarios devueltos', ['users' => $users]);
+
+    }
+
     function decodeToken()
     {
 
@@ -378,22 +404,8 @@ class Controller_Users extends Controller_Rest
         }
     }
 
-    function get_users()
-    {
 
-        $jwt = apache_request_headers()['Authorization'];
-
-        if($this->validateToken($jwt)){
-          $usersDB = Model_Users::find('all');
-
-          $this->createResponse(200, 'Usuarios devueltos', ['users' => $usersDB]);
-
-      }else{
-
-          $this->createResponse(400, 'No tienes permiso para realizar esta acción');
-
-      }
-    }
+    
 
     function post_borrar()
     {
