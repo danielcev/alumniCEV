@@ -91,9 +91,7 @@ class Controller_Users extends Controller_Rest
         {
             return $this->createResponse(400, 'Token no encontrado');
         }
-        // token no valido
         $jwt = apache_request_headers()['Authorization'];
-
         // valdiar token
         try {
 
@@ -160,13 +158,17 @@ class Controller_Users extends Controller_Rest
       		//Creación de token
       		$time = time();
       		$token = array(
-                'iat' => $time, 
-                'data' => [ 
-                'id' => $userDB['id'],
-                'email' => $email,
-                'password' => $password,
-                ]
-            );
+                    'iat' => $time, 
+                    'data' => [ 
+                    'id' => $userDB['id'],
+                    'email' => $email,
+                    'username' => $userDB['username'],
+                    'password' => $password,
+                    'id_rol' => $userDB['id_rol'],
+                    'id_privacity' => $userDB['id_privacity'],
+                    'group' => $userDB['group']
+                    ]
+                );
 
       		$jwt = JWT::encode($token, $this->key);
 
@@ -242,7 +244,53 @@ class Controller_Users extends Controller_Rest
         {
             return $this->createResponse(500, $e->getMessage());
         }
-        
+    }
+
+    function get_validateEmail()
+    {
+        if (empty($_GET['email'])) {
+            return $this->createResponse(400, 'Faltan parametros');
+        }
+        $email = $_GET['email'];
+        try {
+
+            $userDB = Model_Users::find('first', array(
+            'where' => array(
+                array('email', $email),
+                array('is_registered', 1)
+                )
+            )); 
+
+            if($userDB != null){
+                return $this->createResponse(200, 'Correo valido',array('email'=>$email, 'id'=>$userDB->id) );
+            }else{
+                return $this->createResponse(400, 'Email no valido');
+            }
+        } catch (Exception $e) {
+            return $this->createResponse(500, $e->getMessage());
+        }
+    }
+    
+    function post_recoverPassword()
+    {
+       if (empty($_POST['id']) || empty($_POST['password']) ) {
+            return $this->createResponse(400, 'Faltan parametros');
+        } 
+        $id = $_POST['id'];
+        $password = $_POST['password'];
+        try {
+
+            $userDB = Model_Users::find($id); 
+            if($userDB != null){
+                $userDB->password = $password;
+                $userDB->save();
+                return $this->createResponse(200, 'Contraseña cambiada',array('Nueva contraseña'=>$password) );
+            }else{
+                return $this->createResponse(400, 'Usuario no encontrado');
+            }
+        } catch (Exception $e) {
+            return $this->createResponse(500, $e->getMessage());
+        }
     }
 
     function decodeToken()
@@ -253,6 +301,57 @@ class Controller_Users extends Controller_Rest
         return $token;
     }
 
+    function userNotRegistered($email)
+    {
+
+        $userDB = Model_Users::find('first', array(
+            'where' => array(
+                array('email', $email),
+                array('is_registered', 0)
+                )
+            )); 
+
+        if($userDB != null){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    function validateToken($jwt)
+    {
+        $token = JWT::decode($jwt, $this->key, array('HS256'));
+
+        $email = $token->data->email;
+        $password = $token->data->password;
+        $id = $token->data->id;
+
+        $userDB = Model_Users::find('all', array(
+            'where' => array(
+                array('email', $email),
+                array('password', $password),
+                array('id',$id)
+                )
+            ));
+        if($userDB != null){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    function createResponse($code, $message, $data = [])
+    {
+
+        $json = $this->response(array(
+          'code' => $code,
+          'message' => $message,
+          'data' => $data
+          ));
+
+        return $json;
+    }
+/*
     function get_user()
     {
         $jwt = apache_request_headers()['Authorization'];
@@ -338,57 +437,5 @@ class Controller_Users extends Controller_Rest
 
       }
     }
-
-    function userNotRegistered($email)
-    {
-
-        $userDB = Model_Users::find('first', array(
-            'where' => array(
-                array('email', $email),
-                array('is_registered', 0)
-                )
-            )); 
-
-        if($userDB != null){
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-    function validateToken($jwt)
-    {
-        $token = JWT::decode($jwt, $this->key, array('HS256'));
-
-        $username = $token->data->username;
-        $password = $token->data->password;
-        $id = $token->data->id;
-
-        $userDB = Model_Users::find('all', array(
-            'where' => array(
-                array('username', $username),
-                array('password', $password),
-                array('id',$id)
-                )
-            ));
-
-        if($userDB != null){
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-    function createResponse($code, $message, $data = [])
-    {
-
-        $json = $this->response(array(
-          'code' => $code,
-          'message' => $message,
-          'data' => $data
-          ));
-
-        return $json;
-    }
-
+*/
 }
