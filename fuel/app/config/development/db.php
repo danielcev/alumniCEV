@@ -18,9 +18,9 @@
 return array(
 	'default' => array(
 		'connection'  => array(
-			'dsn'        => 'mysql:host=localhost;dbname=danip',
-			'username'   => 'danip',
-			'password'   => '7y1RXtIMBc4ynUvz',
+			'dsn'        => 'mysql:host=localhost;dbname=solfamidas',
+			'username'   => 'solfamidas',
+			'password'   => 'fh5XylgyNwWG0zSL',
 		),
 	),
 );
