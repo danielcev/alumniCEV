@@ -27,14 +27,14 @@ class Controller_Users extends Controller_Rest
 
                 if (substr_count($email, "_") > 0)
                 { //Alumnos
-                    $rol = 3;
+
+                    //$rol = 3;
 
                     $arrayAlumno = explode("_", $username);
                     $group = $arrayAlumno[count($arrayAlumno) - 1];
                     
                     if (count($arrayAlumno) == 3)
                     { //Nombre simple
-                        //return $this->createResponse(200,$name);
                         $name = $arrayAlumno[0]." ".$arrayAlumno[1];
 
                     }
@@ -46,7 +46,8 @@ class Controller_Users extends Controller_Rest
                 }
                 else
                 { //Profesores
-                    $rol = 2;
+
+                    //$rol = 2;
                     $name = $username;
                     $group = 'profesor';
 
@@ -54,7 +55,7 @@ class Controller_Users extends Controller_Rest
 
                 $newPrivacity = new Model_Privacity(array('phone' => 0,'localization' => 0));
                 $newPrivacity->save();
-                $props = array('name' => $name, 'password' => $password, 'id_rol' => $rol, 'group' => $group, 'username' => $username, 'id_privacity' => $newPrivacity->id, 'is_registered' => 1);
+                $props = array('name' => $name, 'password' => $password, 'group' => $group, 'username' => $username, 'id_privacity' => $newPrivacity->id, 'is_registered' => 1);
 
 
                 $newUser = Model_Users::find('first', array(
@@ -73,7 +74,7 @@ class Controller_Users extends Controller_Rest
             else
             { //Si el email no es valido ( no esta en la bbdd o ya esta registrado )
 
-                return $this->createResponse(400, 'E-mail no válido');
+                return $this->createResponse(400, 'E-mail no valido o ya esta registrado');
             } 
 
         }
@@ -106,10 +107,11 @@ class Controller_Users extends Controller_Rest
             return $this->createResponse(401, 'No autorizado');
         }
         // falta parametro email
-        if (empty($_POST['email'])) {
-            return $this->createResponse(400, 'Falta parametro email ');
+        if (empty($_POST['email']) || empty($_POST['id_rol'])) {
+            return $this->createResponse(400, 'Falta parametro email o id_rol ');
         }
         $email = $_POST['email'];
+        $id_rol = $_POST['id_rol'];
         try {
             // validar que no exista ese email en la bbdd
             $userDB = Model_Users::find('first', array(
@@ -122,7 +124,7 @@ class Controller_Users extends Controller_Rest
                 return $this->createResponse(400, 'El email ya existe');
             }
             // crear un nueov usuario
-            $newUser = new Model_Users(array('email' => $email,'is_registered'=> 0));
+            $newUser = new Model_Users(array('email' => $email,'is_registered'=> 0, 'id_rol'=>$id_rol));
             $newUser->save();
             return $this->createResponse(200, 'Usuario insertado con exito');
 
@@ -316,7 +318,51 @@ class Controller_Users extends Controller_Rest
           $users = Model_Users::find('all');
 
           $this->createResponse(200, 'Usuarios devueltos', ['users' => $users]);
+    }
 
+    function get_user(){
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+
+        $user = $this->decodeToken();
+        
+        if (empty($_GET['username'])) 
+        {
+          return $this->createResponse(400, 'Falta parámetros obligatorios (username) ');
+        }
+
+        $username = $_GET['username'];
+
+        try {
+            
+            
+            $usersBD = Model_Users::find('all', array(
+            'where' => array(
+                array('username' ,'LIKE' ,'%'.$username.'%'),
+                ),
+            )); 
+
+            if ($usersBD == null) {
+                return $this->createResponse(400, 'No existe el usuario');
+            }
+            return $this->createResponse(200, 'Listado de usuarios', $usersBD);
+
+        } catch (Exception $e) 
+        {
+            return $this->createResponse(500, $e->getMessage());
+        }
     }
 
     function decodeToken()
