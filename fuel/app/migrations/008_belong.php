@@ -22,10 +22,10 @@ class Belong
                         'column' => 'id',
                     ),
                     'on_update' => 'CASCADE',
-                    'on_delete' => 'RESTRICT'
+                    'on_delete' => 'CASCADE'
                 ),
                 array(
-                    'constraint' => 'claveAjenabelongAEvents',
+                    'constraint' => 'claveAjenabelongAGroup',
                     'key' => 'id_group',
                     'reference' => array(
                         'table' => 'groups',

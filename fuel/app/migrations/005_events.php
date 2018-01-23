@@ -13,8 +13,9 @@ class Events
             'image' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
             'lat' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
             'lon' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
-            'group' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
-            'id_user' => array('type' => 'int', 'constraint' => 5)
+            'date' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
+            'id_user' => array('type' => 'int', 'constraint' => 5),
+            'id_type' => array('type' => 'int', 'constraint' => 5),
         ), array('id'),
             true,
             'InnoDB',
@@ -29,7 +30,17 @@ class Events
                     ),
                     'on_update' => 'CASCADE',
                     'on_delete' => 'RESTRICT'
-                )
+                ),
+                array(
+                    'constraint' => 'claveAjenaEventsAUsers',
+                    'key' => 'id_type',
+                    'reference' => array(
+                        'table' => 'types',
+                        'column' => 'id',
+                    ),
+                    'on_update' => 'CASCADE',
+                    'on_delete' => 'RESTRICT'
+                ),
             ));
     }
 

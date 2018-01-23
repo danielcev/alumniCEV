@@ -16,7 +16,6 @@ class Users
             'is_registered' => array('type' => 'boolean', 'default' => 0),
             'id_rol' => array('type' => 'int', 'constraint' => 5, 'null' => true),
             'id_privacity' => array('type' => 'int', 'constraint' => 5, 'null' => true),
-            'group' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
             'description' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
             'photo' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
             'name' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
@@ -52,7 +51,8 @@ class Users
         \DB::query("ALTER TABLE `users` ADD UNIQUE (`email`)")->execute();
         \DB::query("ALTER TABLE `users` ADD UNIQUE (`phone`)")->execute();
         \DB::query("ALTER TABLE `users` ADD UNIQUE (`username`)")->execute();
-        \DB::query("INSERT INTO `users` (`id`, `email`, `password`, `phone`, `username`, `birthday`, `is_registered`, `id_rol`, `id_privacity`, `group`, `description`, `photo`, `name`, `lon`, `lat`) VALUES (NULL, 'admin@cev.com', 'admin', NULL, 'admin', NULL, '1', '1', NULL, NULL, NULL, NULL, 'admin', NULL, NULL);")->execute();
+        \DB::query("INSERT INTO `users` 
+            (`id`, `email`, `password`, `phone`, `username`, `birthday`, `is_registered`, `id_rol`, `id_privacity`, `description`, `photo`, `name`, `lon`, `lat`) VALUES (NULL, 'admin@cev.com', 'admin', NULL, 'admin', NULL, '1', '1', NULL,  NULL, NULL, 'admin', NULL, NULL);")->execute();
 
     }
 
