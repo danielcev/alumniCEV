@@ -11,6 +11,9 @@ class Types
             'name' => array('type' => 'varchar', 'constraint'=>50),
 
         ), array('id'));
+        \DB::query("INSERT INTO `types` (`id`, `name`) VALUES (NULL, 'Noticias');")->execute();
+        \DB::query("INSERT INTO `types` (`id`, `name`) VALUES (NULL, 'Ofertas trabajo');")->execute();
+        \DB::query("INSERT INTO `types` (`id`, `name`) VALUES (NULL, 'Notificaciones');")->execute();
     }
 
     function down()

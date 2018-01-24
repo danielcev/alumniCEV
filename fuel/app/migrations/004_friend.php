@@ -23,8 +23,9 @@ class Friend
                         'table' => 'users',
                         'column' => 'id',
                     ),
+                    // cuando borro un usuario borro amistad
                     'on_update' => 'CASCADE',
-                    'on_delete' => 'RESTRICT'
+                    'on_delete' => 'CASCADE'
                 ),
                 array(
                     'constraint' => 'claveAjenaFriendReceiveAUsers',
@@ -33,6 +34,7 @@ class Friend
                         'table' => 'users',
                         'column' => 'id',
                     ),
+                    // cuando borro un usuario borro amistad
                     'on_update' => 'CASCADE',
                     'on_delete' => 'CASCADE'
                 )

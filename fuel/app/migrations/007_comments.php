@@ -1,51 +1,50 @@
 <?php
 namespace Fuel\Migrations;
 
-class Events
+class Comments
 {
 
     function up()
     {
-        \DBUtil::create_table('events', array(
+        \DBUtil::create_table('comments', array(
             'id' => array('type' => 'int', 'constraint' => 5, 'auto_increment' => true),
             'title' => array('type' => 'varchar', 'constraint' => 100),
             'description' => array('type' => 'varchar', 'constraint' => 100),
-            'image' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
-            'lat' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
-            'lon' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
             'date' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
-            'id_user' => array('type' => 'int', 'constraint' => 5),
-            'id_type' => array('type' => 'int', 'constraint' => 5),
+            'id_event' => array('type' => 'int', 'constraint' => 5),
+            'id_user' => array('type' => 'int', 'constraint' => 5)
         ), array('id'),
             true,
             'InnoDB',
             'utf8_unicode_ci',
             array(
                 array(
-                    'constraint' => 'claveAjenaEventsAUsers',
+                    'constraint' => 'claveAjenaCommentsAUsers',
                     'key' => 'id_user',
                     'reference' => array(
                         'table' => 'users',
                         'column' => 'id',
                     ),
+                    // cuando borro un usuario borro comentarios ???
                     'on_update' => 'CASCADE',
                     'on_delete' => 'RESTRICT'
                 ),
                 array(
-                    'constraint' => 'claveAjenaEventsAUsers',
-                    'key' => 'id_type',
+                    'constraint' => 'claveAjenaCommentsAEvents',
+                    'key' => 'id_event',
                     'reference' => array(
-                        'table' => 'types',
+                        'table' => 'events',
                         'column' => 'id',
                     ),
+                    // cuando borro un evento borro sus comentarios
                     'on_update' => 'CASCADE',
-                    'on_delete' => 'RESTRICT'
-                ),
+                    'on_delete' => 'CASCADE'
+                )
             ));
     }
 
     function down()
     {
-       \DBUtil::drop_table('events');
+       \DBUtil::drop_table('comments');
     }
 }

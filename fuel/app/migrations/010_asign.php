@@ -1,45 +1,48 @@
 <?php
 namespace Fuel\Migrations;
 
-class Belong
+class Asign
 {
 
     function up()
     {
-        \DBUtil::create_table('belong', array(
-            'id_user' => array('type' => 'int', 'constraint' => 5),
+        \DBUtil::create_table('asign', array(
+            'id_event' => array('type' => 'int', 'constraint' => 5),
             'id_group' => array('type' => 'int', 'constraint' => 5),
-        ), array('id_user','id_group'),
+        ), array('id_event','id_group'),
             true,
             'InnoDB',
             'utf8_unicode_ci',
             array(
                 array(
-                    'constraint' => 'claveAjenabelongAUsers',
-                    'key' => 'id_user',
+                    'constraint' => 'claveAjenaasignAevents',
+                    'key' => 'id_event',
                     'reference' => array(
-                        'table' => 'users',
+                        'table' => 'events',
                         'column' => 'id',
                     ),
+                    // cuando borro un evento lo desasigno del grupo
                     'on_update' => 'CASCADE',
                     'on_delete' => 'CASCADE'
                 ),
                 array(
-                    'constraint' => 'claveAjenabelongAGroup',
+                    'constraint' => 'claveAjenaasignAGroups',
                     'key' => 'id_group',
                     'reference' => array(
                         'table' => 'groups',
                         'column' => 'id',
                     ),
+                    // cuando borro un grupo le desasigno los eventos
                     'on_update' => 'CASCADE',
-                    'on_delete' => 'RESTRICT'
+                    'on_delete' => 'CASCADE'
                 )
             ));
-        
+
+
     }
 
     function down()
     {
-       \DBUtil::drop_table('belong');
+       \DBUtil::drop_table('asign');
     }
 }
