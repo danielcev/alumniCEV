@@ -117,7 +117,7 @@ class Controller_Users extends Controller_Rest
         // falta token
         if (!isset(apache_request_headers()['Authorization']))
         {
-            return $this->createResponse(400, 'Token no encontrado');
+            return $this->createResponse(400,'Token no encontrado');
         }
         $jwt = apache_request_headers()['Authorization'];
         // valdiar token
@@ -141,13 +141,14 @@ class Controller_Users extends Controller_Rest
         $id = $_POST['id'];
 
         try {
-            // validar que no exista ese email en la bbdd
+            // validar que no exista ese usuario en la bbdd
             $userDB = Model_Users::find($id);
             if ($userDB == null) 
             {
                 return $this->createResponse(400, 'El usuario no existe');
             }
             $userDB->delete();
+            //return $this->createResponse(400, $userDB);
             return $this->createResponse(200, 'Usuario borrado');
 
         } catch (Exception $e) 

@@ -14,6 +14,7 @@ class Events
             'lat' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
             'lon' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
             'date' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
+            'url' => array('type' => 'varchar', 'constraint' => 150, 'null' => true),
             'id_user' => array('type' => 'int', 'constraint' => 5,'null'=>true),
             'id_type' => array('type' => 'int', 'constraint' => 5),
         ), array('id'),

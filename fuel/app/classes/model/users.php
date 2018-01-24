@@ -46,7 +46,7 @@ class Model_Users extends Orm\Model
             'data_type' => 'varchar',
         ),
     );
-
+/*
     protected static $_has_one = array(
     'roles' => array(
         'key_from' => 'id',
@@ -62,6 +62,6 @@ class Model_Users extends Orm\Model
         'cascade_save' => true,
         'cascade_delete' => true,
     )
-);
+);*/
 
 }

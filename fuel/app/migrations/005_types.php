@@ -14,6 +14,7 @@ class Types
         \DB::query("INSERT INTO `types` (`id`, `name`) VALUES (NULL, 'Eventos');")->execute();
         \DB::query("INSERT INTO `types` (`id`, `name`) VALUES (NULL, 'Ofertas trabajo');")->execute();
         \DB::query("INSERT INTO `types` (`id`, `name`) VALUES (NULL, 'Notificaciones');")->execute();
+        \DB::query("INSERT INTO `types` (`id`, `name`) VALUES (NULL, 'Noticias');")->execute();
 
     }
 
