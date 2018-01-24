@@ -14,7 +14,7 @@ class Events
             'lat' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
             'lon' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
             'date' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
-            'id_user' => array('type' => 'int', 'constraint' => 5),
+            'id_user' => array('type' => 'int', 'constraint' => 5,'null'=>true),
             'id_type' => array('type' => 'int', 'constraint' => 5),
         ), array('id'),
             true,
@@ -28,9 +28,9 @@ class Events
                         'table' => 'users',
                         'column' => 'id',
                     ),
-                    // cuando borre un usuario se borran sus eventos creados
+                    // cuando borre un usuario no borran sus eventos creados id_user = null
                     'on_update' => 'CASCADE',
-                    'on_delete' => 'CASCADE'
+                    'on_delete' => 'SET NULL'
                 ),
                 array(
                     'constraint' => 'claveAjenaEventsATypes',
@@ -39,7 +39,7 @@ class Events
                         'table' => 'types',
                         'column' => 'id',
                     ),
-                    //cuando borro un tipo no borro los eventos de ese tipo ????
+                    //no puedo borrar un tipo si tiene eventos asignados
                     'on_update' => 'CASCADE',
                     'on_delete' => 'RESTRICT'
                 ),

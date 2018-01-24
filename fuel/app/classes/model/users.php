@@ -30,9 +30,6 @@ class Model_Users extends Orm\Model
         'id_privacity' => array(
             'data_type' => 'int',
         ),
-        'group' => array(
-            'data_type' => 'varchar',
-        ),
         'description' => array(
             'data_type' => 'varchar',
         ),

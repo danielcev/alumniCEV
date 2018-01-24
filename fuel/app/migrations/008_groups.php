@@ -16,9 +16,10 @@ class Groups
             null);
 
         //\DB::query("INSERT INTO `groups` (`id`, `name`) VALUES (NULL, 'all');")->execute();
-        \DB::query("INSERT INTO `groups` (`id`, `name`) VALUES (NULL, 'profesores');")->execute();
-        \DB::query("INSERT INTO `groups` (`id`, `name`) VALUES (NULL, 'alumnos');")->execute();
-        \DB::query("INSERT INTO `groups` (`id`, `name`) VALUES (NULL, 'ex-alumnos');")->execute();
+        \DB::query("INSERT INTO `groups` (`id`, `name`) VALUES (NULL, 'Profesores');")->execute();
+        \DB::query("INSERT INTO `groups` (`id`, `name`) VALUES (NULL, 'Alumnos');")->execute();
+        \DB::query("INSERT INTO `groups` (`id`, `name`) VALUES (NULL, 'Ex-alumnos');")->execute();
+        
     }
 
     function down()

@@ -20,22 +20,15 @@ class Model_Events extends Orm\Model
         'lon' => array(
             'data_type' => 'float'
         ),
-        'group' => array(
-            'data_type' => 'int'
+        'date' => array(
+            'data_type' => 'varchar'
         ),
         'id_user' => array(
             'data_type' => 'int'
+        ),
+        'id_type' => array(
+            'data_type' => 'int'
         )
     );
-/*
-    protected static $_belongs_to = array(
-    'users' => array(
-        'key_from' => 'id_privacity',
-        'model_to' => 'Model_Users',
-        'key_to' => 'id',
-        'cascade_save' => true,
-        'cascade_delete' => false,
-    )
-);*/
 
 }

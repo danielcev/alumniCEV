@@ -33,7 +33,7 @@ class Users
                         'table' => 'roles',
                         'column' => 'id',
                     ),
-                    // cuando borro un rol no borro los usuarios de ese rol
+                    // no se puede borrar rol si tiene usuarios asignados
                     'on_update' => 'CASCADE',
                     'on_delete' => 'RESTRICT'
                 ),
@@ -44,7 +44,7 @@ class Users
                         'table' => 'privacity',
                         'column' => 'id',
                     ),
-                    // cuando borro privacidad no borro el usuario
+                    // no se puede borrar privacidad si tiene usuario asignado
                     'on_update' => 'CASCADE',
                     'on_delete' => 'RESTRICT'
                 )

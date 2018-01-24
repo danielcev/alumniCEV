@@ -25,9 +25,9 @@ class Comments
                         'table' => 'users',
                         'column' => 'id',
                     ),
-                    // cuando borro un usuario borro comentarios ???
+                    // cuando borro un usuario borro comentarios
                     'on_update' => 'CASCADE',
-                    'on_delete' => 'RESTRICT'
+                    'on_delete' => 'CASCADE'
                 ),
                 array(
                     'constraint' => 'claveAjenaCommentsAEvents',
