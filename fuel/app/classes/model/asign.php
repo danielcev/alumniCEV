@@ -10,7 +10,6 @@ class Model_Asign extends Orm\Model
             'data_type' => 'int'),
         'id_group' => array(
             'data_type' => 'int'),
-
     );
 
 }

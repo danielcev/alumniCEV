@@ -23,6 +23,9 @@ class Model_Events extends Orm\Model
         'date' => array(
             'data_type' => 'varchar'
         ),
+        'url' => array(
+            'data_type' => 'varchar'
+        ),
         'id_user' => array(
             'data_type' => 'int'
         ),

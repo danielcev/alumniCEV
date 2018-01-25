@@ -7,7 +7,6 @@ class Asign
     function up()
     {
         \DBUtil::create_table('asign', array(
-            'id' => array('type' => 'int', 'constraint' => 5, 'auto_increment' => true),
             'id_event' => array('type' => 'int', 'constraint' => 5),
             'id_group' => array('type' => 'int', 'constraint' => 5),
         ), array('id_event','id_group'),

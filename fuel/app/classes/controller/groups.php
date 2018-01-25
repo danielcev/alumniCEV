@@ -127,7 +127,7 @@ class Controller_Groups extends Controller_Rest
           $this->createResponse(200, 'Grupos devueltos', ['groups' => $groups]);
     }
 
-    function post_asign()
+    function post_assign()
     {
     	if (!isset(apache_request_headers()['Authorization']))
         {
@@ -188,6 +188,64 @@ class Controller_Groups extends Controller_Rest
             return $this->createResponse(500, $e->getMessage());
         }
     }
+    function post_unassign()
+    {
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400,'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+        // validar rol de admin
+        $user = $this->decodeToken();
+        if ($user->data->id_rol != 1) {
+            return $this->createResponse(401, 'No autorizado');
+        }
+        // falta parametro email
+        if (empty($_POST['id_user']) || empty($_POST['id_group'])) {
+            return $this->createResponse(400, 'Falta parametro id_user, id_group');
+        }
+
+        $id_user = $_POST['id_user'];
+        $id_group = $_POST['id_group'];
+        try {
+            $groupDB = Model_Groups::find($id_group);
+            if ($groupDB == null) 
+            {
+                return $this->createResponse(400, 'El grupo no existe');
+            }
+            $userDB = Model_Groups::find($id_user);
+            if ($userDB == null) 
+            {
+                return $this->createResponse(400, 'El usuario no existe');
+            }
+            
+            $belongDB = Model_Belong::find('first',array(
+                'where'=>array(
+                    array('id_user',$id_user),
+                    array('id_group',$id_group),
+                ),
+            ));
+            if ($belongDB==null) {
+                return $this->createResponse(400, 'Usuario no pertenece al grupo');
+
+            }
+            $belongDB->delete();
+            return $this->createResponse(200, 'Usuario desasignado del grupo');
+
+        } catch (Exception $e) 
+        {
+            return $this->createResponse(500, $e->getMessage());
+        }
+    }
+
 
     //-----
     function decodeToken()
@@ -196,23 +254,6 @@ class Controller_Groups extends Controller_Rest
         $jwt = apache_request_headers()['Authorization'];
         $token = JWT::decode($jwt, $this->key , array('HS256'));
         return $token;
-    }
-
-    function userNotRegistered($email)
-    {
-
-        $userDB = Model_Users::find('first', array(
-            'where' => array(
-                array('email', $email),
-                array('is_registered', 0)
-                )
-            )); 
-
-        if($userDB != null){
-            return true;
-        }else{
-            return false;
-        }
     }
 
     function validateToken($jwt)
