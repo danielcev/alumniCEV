@@ -45,6 +45,8 @@ class Controller_Comments extends Controller_Rest
             $commentDB->title = $title;
             $commentDB->description = $description;
 			$commentDB->id_event = $id_event;
+            // horario español
+            date_default_timezone_set('CET');
 			$commentDB->date = date('Y-m-d H:i:s');
             $commentDB->id_user = $user->data->id;
 
@@ -85,7 +87,7 @@ class Controller_Comments extends Controller_Rest
         try {
         	$commentDB = Model_Comments::find($id_comment);
         	if ($commentDB == null) {
-        		return $this->createResponse(400, 'El evento no existe');
+        		return $this->createResponse(400, 'El Comentario no existe');
         	}
         	$eventDB = Model_Events::find($commentDB->id_event);
         	// comentario propio, evento propio, user admin

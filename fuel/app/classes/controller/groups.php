@@ -124,7 +124,7 @@ class Controller_Groups extends Controller_Rest
 
           $groups = Model_Groups::find('all');
 
-          $this->createResponse(200, 'Grupos devueltos', ['groups' => $groups]);
+          $this->createResponse(200, 'Grupos devueltos', Arr::reindex($groups));
     }
 
     function post_assign()

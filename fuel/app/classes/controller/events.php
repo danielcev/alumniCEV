@@ -111,7 +111,7 @@ class Controller_Events extends Controller_Rest
         }
 
         $user = $this->decodeToken();
-   
+        $id= $user->data->id;
         if (empty($_GET['type'])) 
         {
           return $this->createResponse(400, 'Falta parámetros obligatorios (type, 0 -> todos, 1-> eventos, 2-> ofertas trabajo, 3 -> notificaciones, 4 -> noticias) ');
@@ -120,14 +120,32 @@ class Controller_Events extends Controller_Rest
         $type = $_GET['type'];
         try {
             
-            $query = \DB::query('SELECT *
-                                 FROM  belong
-                                 WHERE id_user = '.$user->data->id.'
-                                        JOIN groups
-                                           ON groups.id = belong.id_group'
-                                           )
-                    ->as_assoc()
-                    ->execute(); 
+            if ($type == 0 ) {
+                $query = \DB::query('SELECT events.* FROM belong 
+                                        JOIN users ON users.id = '.$id.' 
+                                        JOIN groups ON groups.id = belong.id_group 
+                                        JOIN asign ON asign.id_group = belong.id_group 
+                                        JOIN events ON events.id = asign.id_event'
+                                        )->as_assoc()->execute();
+                
+
+            }else{
+                $typeDB = Model_Types::find($type);
+                if ($typeDB == null) {
+                    return $this->createResponse(400, 'Parametro type no valido');
+                }
+                $query = \DB::query('SELECT events.* FROM belong 
+                                        JOIN users ON users.id = '.$id.' 
+                                        JOIN groups ON groups.id = belong.id_group 
+                                        JOIN asign ON asign.id_group = belong.id_group 
+                                        JOIN events ON events.id = asign.id_event
+                                        WHERE events.id_type='.$type.''
+                                        )->as_assoc()->execute();
+
+            }
+            if (count($query) == 0) {
+                return $this->createResponse(400, 'Listado de eventos vacio');
+            }
 
             return $this->createResponse(200, 'Listado de eventos', $query);
 
@@ -172,12 +190,21 @@ class Controller_Events extends Controller_Rest
 
             }
 
-            // TODO sacar los comentarios y devolverlos --------------------------------------------------------------------------
+            // TODO sacar los 3 comentarios y devolverlos --------------------------------------------------------------------------
             $commentsBD = Model_Comments::find('all', array(
                 'where' => array(
                 array('id_event' ,$id),
-                ),
+                )
             ));
+            foreach ($commentsBD as $key => $comment) {
+                $userBD = Model_Users::find($comment->id_user);
+                $comment['username']= $userBD->username;
+            }
+
+            // dejar solo 3 ultimos comentarios
+            for ($i=0; $i < count($commentsBD)-1; $i++) { 
+                unset($commentsBD[$i]);
+            }
             return $this->createResponse(200, 'Evento y comentarios', array('event'=>$event , 'comments'=> $commentsBD));
 
         } catch (Exception $e) 
@@ -228,6 +255,86 @@ class Controller_Events extends Controller_Rest
             }
 
             
+
+        } catch (Exception $e) 
+        {
+            return $this->createResponse(500, $e->getMessage());
+        }
+    }
+
+    function get_find()
+    {
+
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+
+        $user = $this->decodeToken();
+
+        if (empty($_GET['search'])) 
+        {
+          return $this->createResponse(400, 'Falta parámetros obligatorios (search) ');
+        }
+
+        $search = $_GET['search'];
+   
+        try {
+            
+            $eventsDB = Model_Events::find('all', array(
+            'where' => array(
+                array('description' ,'LIKE' ,'%'.$search.'%'),'or' => array(array('title' ,'LIKE' ,'%'.$search.'%'))
+                ),
+            )); 
+
+            if ($eventsDB == null) {
+                return $this->createResponse(400, 'No existen eventos');
+            }
+
+            return $this->createResponse(200, 'Listado de eventos', $eventsDB);
+
+        } catch (Exception $e) 
+        {
+            return $this->createResponse(500, $e->getMessage());
+        }
+    }
+
+    function get_types()
+    {
+
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+
+        $user = $this->decodeToken();
+   
+        try {
+            $typesBD = Model_Types::find('all');
+            if ($typesBD== null) {
+                return $this->createResponse(400, 'No existe ningun tipo');
+            }
+            return $this->createResponse(200, $typesBD);
 
         } catch (Exception $e) 
         {
