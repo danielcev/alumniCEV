@@ -1,11 +1,11 @@
 <?php
-return array(
+return array (
   'version' => 
-  array(
+  array (
     'app' => 
-    array(
+    array (
       'default' => 
-      array(
+      array (
         0 => '001_roles',
         1 => '002_privacity',
         2 => '003_users',
@@ -19,10 +19,10 @@ return array(
       ),
     ),
     'module' => 
-    array(
+    array (
     ),
     'package' => 
-    array(
+    array (
     ),
   ),
   'folder' => 'migrations/',

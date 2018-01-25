@@ -34,7 +34,7 @@ class Belong
                     ),
                     // cuando borro un -grupo- los usuarios dejan de pertenecer al grupo
                     'on_update' => 'CASCADE',
-                    'on_delete' => 'RESTRICT'
+                    'on_delete' => 'CASCADE'
                 )
             ));
         

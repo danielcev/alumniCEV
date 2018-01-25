@@ -78,32 +78,46 @@ class Controller_Users extends Controller_Rest
             return $this->createResponse(401, 'No autorizado');
         }
         // falta parametro email
-        if (empty($_POST['email']) || empty($_POST['id_rol']) || empty($_POST['group']) || empty($_POST['name'])) {
-            return $this->createResponse(400, 'Falta parametro email, id_rol, group, name');
+        if (empty($_POST['email']) || empty($_POST['id_rol']) || empty($_POST['id_group']) || empty($_POST['name'])) {
+            return $this->createResponse(400, 'Falta parametro email, id_rol, id_group, name');
         }
         $email = $_POST['email'];
         $id_rol = $_POST['id_rol'];
-        $group = $_POST['group'];
+        $id_group = $_POST['id_group'];
         $name = $_POST['name'];
         $username = explode("@", $email)[0];
         try {
+            $rolDB = Model_Roles::find($id_rol);
+            if ($rolDB == null) {
+                return $this->createResponse(400, 'Rol no valido (1-> admin, 2-> profesor, 3-> alumno)');
+            }
+            //grupo 
+            $groupDB = Model_Groups::find($id_group);
+            if ($groupDB == null) {
+                return $this->createResponse(400, 'id_group no valido');
+            }
+
             // validar que no exista ese email en la bbdd
             $userDB = Model_Users::find('first', array(
                'where' => array(
                    array('email', $email),
                    ),
             ));
-            $rolDB = Model_Roles::find($id_rol);
-            if ($rolDB == null) {
-                return $this->createResponse(400, 'Rol no valido (1-> admin, 2-> profesor, 3-> alumno)');
-            }
+
             if ($userDB != null) 
             {
                 return $this->createResponse(400, 'El email ya existe');
             }
             // crear un nueov usuario
-            $newUser = new Model_Users(array('email' => $email,'is_registered'=> 0, 'id_rol'=>$id_rol, 'group' => $group, 'name' => $name,'username'=> $username));
+            $newUser = new Model_Users(array('email' => $email,'is_registered'=> 0, 'id_rol'=>$id_rol,  'name' => $name,'username'=> $username));
             $newUser->save();
+
+            // usuario a grupo
+            $belongDB = new Model_Belong();
+            $belongDB->id_user = $newUser->id;
+            $belongDB->id_group = $groupDB->id;
+            $belongDB->save();
+
             return $this->createResponse(200, 'Usuario insertado con exito');
 
         } catch (Exception $e) 
@@ -266,6 +280,72 @@ class Controller_Users extends Controller_Rest
             }
         } 
         catch (Exception $e) 
+        {
+            return $this->createResponse(500, $e->getMessage());
+        }
+    }
+
+    function post_update()
+    {
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+        // falta parametro 
+        if (empty($_POST['id']) ) {
+            return $this->createResponse(400, 'Falta parametro id');
+        }
+        $id = $_POST['id'];
+        //admin modifica todos y el usuario el suyo propio
+        $user = $this->decodeToken();
+        if ($user->data->id_rol != 1 && $user->data->id != $id) {
+            return $this->createResponse(401, 'No autorizado');
+        }
+
+        
+        try {
+            
+            $userBD = Model_Users::find($id);
+            if ($userBD == null) {
+                return $this->createResponse(400, 'No existe el usuario');
+            }
+
+            if (!empty($_POST['email']) ) {
+                $userBD->email = $_POST['email'];
+            }
+            if (!empty($_POST['phone']) ) {
+                $userBD->phone = $_POST['phone'];
+            }
+            if (!empty($_POST['birthday']) ) {
+                $userBD->birthday = $_POST['birthday'];
+            }
+            if (!empty($_POST['description']) ) {
+                $userBD->description = $_POST['description'];
+            }
+            if (!empty($_POST['photo']) ) {
+                $userBD->photo = $_POST['photo'];
+            }
+            if (!empty($_POST['id_rol']) ) {
+                $rolDB = Model_Roles::find($_POST['id_rol']);
+                if ($rolDB == null) {
+                    return $this->createResponse(200, 'Rol no valido');
+                }
+                $userBD->id_rol = $_POST['id_rol'];
+            }
+            $userBD->save();
+            return $this->createResponse(200, 'Usuario actualizado');
+
+        } catch (Exception $e) 
         {
             return $this->createResponse(500, $e->getMessage());
         }

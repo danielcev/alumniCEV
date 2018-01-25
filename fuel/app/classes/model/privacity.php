@@ -11,7 +11,7 @@ class Model_Privacity extends Orm\Model
         'localization' => array(
             'data_type' => 'int'
         ));
-
+/*
 	protected static $_belongs_to = array(
     'users' => array(
         'key_from' => 'id_privacity',
@@ -20,6 +20,6 @@ class Model_Privacity extends Orm\Model
         'cascade_save' => true,
         'cascade_delete' => false,
     )
-);
+);*/
 
 }
