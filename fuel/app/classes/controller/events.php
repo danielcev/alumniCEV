@@ -193,20 +193,17 @@ class Controller_Events extends Controller_Rest
             }
 
             // TODO sacar los 3 comentarios y devolverlos --------------------------------------------------------------------------
-            $commentsBD = Model_Comments::find('all', array(
-                'where' => array(
-                array('id_event' ,$id),
-                )
-            ));
+            $commentsBD = Model_Comments::find('all',array('rows_limit' => 3),
+                array('where' => array(array('id_event' ,$id)))
+            );
+            //$commentsBD = Arr::reindex($commentsBD)
+
             foreach ($commentsBD as $key => $comment) {
                 $userBD = Model_Users::find($comment->id_user);
                 $comment['username']= $userBD->username;
             }
 
-            // dejar solo 3 ultimos comentarios
-            for ($i=0; $i < count($commentsBD)-1; $i++) { 
-                unset($commentsBD[$i]);
-            }
+
             return $this->createResponse(200, 'Evento y comentarios', array('event'=>$event , 'comments'=> $commentsBD));
 
         } catch (Exception $e) 
@@ -333,12 +330,67 @@ class Controller_Events extends Controller_Rest
    
         try {
             $typesBD = Model_Types::find('all');
-            if ($typesBD== null) {
+            if ($typesBD== null) 
+            {
                 return $this->createResponse(400, 'No existe ningun tipo');
             }
+
             return $this->createResponse(200, "Tipos devueltos", Arr::reindex($typesBD));
 
         } catch (Exception $e) 
+        {
+            return $this->createResponse(500, $e->getMessage());
+        }
+    }
+
+    function get_comments()
+    {
+
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+
+        $user = $this->decodeToken();
+   
+        if (empty($_GET['id_event'])) 
+        {
+          return $this->createResponse(400, 'Falta parámetros obligatorios (id_event) ');
+        }
+        $id_event= $_GET['id_event'];
+
+        try {
+            $eventDB = Model_Events::find($id_event);
+            if (empty($eventDB)) {
+                return $this->createResponse(400, "No existe el evento");
+            }
+
+            $commentsBD = Model_Comments::find('all', array(
+            'where' => array(
+                array('id_event',$id_event)
+                )
+            )); 
+            if (empty($commentsBD)) {
+                return $this->createResponse(400, "No existen comentarios");
+            }
+            foreach ($commentsBD as $key => $comment) {
+                $userBD = Model_Users::find($comment->id_user);
+                $comment['username']= $userBD->username;
+            }
+            return $this->createResponse(200, "Listado de comentarios", Arr::reindex($commentsBD));
+
+        } 
+        catch (Exception $e) 
         {
             return $this->createResponse(500, $e->getMessage());
         }
