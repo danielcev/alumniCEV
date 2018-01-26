@@ -9,6 +9,7 @@ class Controller_Events extends Controller_Rest
 
     function post_create()
     {
+        
         // falta token
         if (!isset(apache_request_headers()['Authorization']))
         {
@@ -16,10 +17,12 @@ class Controller_Events extends Controller_Rest
         }
         $jwt = apache_request_headers()['Authorization'];
         // valdiar token
-        try {
-
+        try 
+        {
             $this->validateToken($jwt);
-        } catch (Exception $e) {
+        } 
+        catch (Exception $e) 
+        {
 
             return $this->createResponse(400, 'Error de autentificacion');
         }
@@ -33,14 +36,14 @@ class Controller_Events extends Controller_Rest
         }*/
         // falta parametro email
         if (empty($_POST['title']) || empty($_POST['description']) || empty($_POST['id_group'])|| empty($_POST['id_type'])) 
-            {
+        {
 
-              return $this->createResponse(400, 'Falta parámetros obligatorios (title, description,[id_group]), id_type ');
-            }
+          return $this->createResponse(400, 'Falta parámetros obligatorios (title, description,[id_group]), id_type ');
+        }
 
         $title = $_POST['title'];
         $description = $_POST['description'];
-        $id_group = $_POST['id_group'];
+        $array_id_group = $_POST['id_group'];
         $id_type = $_POST['id_type'];
 
         try {
@@ -49,7 +52,7 @@ class Controller_Events extends Controller_Rest
             $eventDB->description = $description;
 
             $typeDB = Model_Types::find($id_type);
-            if ($typeDB==null) {
+            if (empty($typeDB)) {
                 return $this->createResponse(400, 'No existe el tipo de evento mandado por parametro');
             }
 
@@ -71,24 +74,23 @@ class Controller_Events extends Controller_Rest
             $eventDB->id_user = $user->data->id;
 
             $eventDB->save();
-            foreach ($id_group as $key => $group) {
+            foreach ($array_id_group as $key => $idGroup) 
+            {
 
-                $groupDB = Model_Groups::find($group);
-                if ($groupDB!= null) {
-                    $asignDB = new Model_Asign();
-                    $asignDB->id_event = $eventDB->id;
-                    $asignDB->id_group = $group;
-                    
-                    $asignDB->save();
-                    return $this->createResponse(200, $asignDB);
-                }
-                
+                $props = array('id_event'=>$eventDB->id, 'id_group' => $idGroup);
+                $asignDB = new Model_Asign($props);
+                $asignDB->save();
             }
             return $this->createResponse(200, 'Evento creado');
 
         } catch (Exception $e) 
         {
             return $this->createResponse(500, $e->getMessage());
+            try {
+                $eventDB->delete();
+            } catch (Exception $e) {
+                return $this->createResponse(500, $e->getMessage());
+            }
         }
     }
 
@@ -334,7 +336,7 @@ class Controller_Events extends Controller_Rest
             if ($typesBD== null) {
                 return $this->createResponse(400, 'No existe ningun tipo');
             }
-            return $this->createResponse(200, $typesBD);
+            return $this->createResponse(200, "Tipos devueltos", Arr::reindex($typesBD));
 
         } catch (Exception $e) 
         {
