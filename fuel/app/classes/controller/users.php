@@ -418,9 +418,19 @@ class Controller_Users extends Controller_Rest
             return $this->createResponse(400, 'Error de autentificacion');
         }
 
-          $users = Model_Users::find('all');
+          //$users = Model_Users::find('all');
+          $users = Model_Users::query()->related('roles')->get();
 
-          $this->createResponse(200, 'Usuarios devueltos', ['users' => $users]);
+          foreach ($users as $keyUsers => $user) 
+          {
+              foreach ($user->roles as $keyRoles => $value) {
+                  $users[$keyUsers]['rol'] = $value->type;
+                  unset($users[$keyUsers]['roles']);
+              }
+              
+          }
+          return $this->createResponse(200, 'Usuarios devueltos', Arr::reindex($users));
+          exit;   
     }
 
     function get_user()
