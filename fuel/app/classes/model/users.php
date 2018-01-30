@@ -47,21 +47,37 @@ class Model_Users extends Orm\Model
         ),
     );
     
+    protected static $_belongs_to = array(
+        'roles' => array(
+            'key_from' => 'id_rol',
+            'model_to' => 'Model_Roles',
+            'key_to' => 'id',
+            'cascade_save' => true,
+            'cascade_delete' => false,
+        ),
+        'privacity' => array(
+            'key_from' => 'id_privacity',
+            'model_to' => 'Model_Privacity',
+            'key_to' => 'id',
+            'cascade_save' => true,
+            'cascade_delete' => true,
+        )
+    );
     protected static $_has_many = array(
-    'roles' => array(
-        'key_from' => 'id_rol',
-        'model_to' => 'Model_Roles',
-        'key_to' => 'id',
-        'cascade_save' => true,
-        'cascade_delete' => false,
-    ),
-    'privacity' => array(
-        'key_from' => 'id',
-        'model_to' => 'Model_Privacity',
-        'key_to' => 'id_privacity',
-        'cascade_save' => true,
-        'cascade_delete' => true,
-    )
-);
+        'events' => array(
+            'key_from' => 'id',
+            'model_to' => 'Model_Events',
+            'key_to' => 'id_user',
+            'cascade_save' => true,
+            'cascade_delete' => false,
+        ),
+        'comments' => array(
+            'key_from' => 'id',
+            'model_to' => 'Model_Comments',
+            'key_to' => 'id_user',
+            'cascade_save' => true,
+            'cascade_delete' => false,
+        ),
+    );
 
 }

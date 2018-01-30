@@ -280,6 +280,7 @@ class Controller_Events extends Controller_Rest
         }
 
         $user = $this->decodeToken();
+        $id = $user->data->id;
 
         if (empty($_GET['search'])) 
         {
@@ -287,20 +288,43 @@ class Controller_Events extends Controller_Rest
         }
 
         $search = $_GET['search'];
+        $search = '"%'.$search.'%"';
    
         try {
-            
+            /*
+            $query = DB::select()->from('belong');
+            $query->join('users');
+            $query->on('users.id','=',$id);
+            $query->join('groups');
+            $query->on('groups.id','=','belong.id_group');
+            $query->join('asign');
+            $query->on('asign.id_group','=','belong.id_group');
+            $query->join('events');
+            $query->on('events.id','=','asign.id_event');
+            $query->where('event.description','LIKE',$search);
+*/
+
+            $query = \DB::query('SELECT events.* FROM belong 
+                                        JOIN users ON users.id = '.$id.' 
+                                        JOIN groups ON groups.id = belong.id_group 
+                                        JOIN asign ON asign.id_group = belong.id_group 
+                                        JOIN events ON events.id = asign.id_event
+                                        WHERE events.title LIKE '.$search.' OR events.description LIKE '.$search
+                                        )->as_assoc()->execute();
+
+
+            /*
             $eventsDB = Model_Events::find('all', array(
             'where' => array(
                 array('description' ,'LIKE' ,'%'.$search.'%'),'or' => array(array('title' ,'LIKE' ,'%'.$search.'%'))
                 ),
-            )); 
+            )); */
 
-            if ($eventsDB == null) {
+            if ($query == null) {
                 return $this->createResponse(400, 'No existen eventos');
             }
 
-            return $this->createResponse(200, 'Listado de eventos', $eventsDB);
+            return $this->createResponse(200, 'Listado de eventos', $query);
 
         } catch (Exception $e) 
         {

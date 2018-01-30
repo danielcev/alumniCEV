@@ -34,4 +34,30 @@ class Model_Events extends Orm\Model
         )
     );
 
+    protected static $_belongs_to = array(
+        'users' => array(
+            'key_from' => 'id_user',
+            'model_to' => 'Model_Users',
+            'key_to' => 'id',
+            'cascade_save' => true,
+            'cascade_delete' => false,
+        ),
+        'types' => array(
+            'key_from' => 'id_type',
+            'model_to' => 'Model_Types',
+            'key_to' => 'id',
+            'cascade_save' => true,
+            'cascade_delete' => true,
+        )
+    );
+    protected static $_has_many = array(
+        'comments' => array(
+            'key_from' => 'id',
+            'model_to' => 'Model_Comments',
+            'key_to' => 'id_event',
+            'cascade_save' => true,
+            'cascade_delete' => false,
+        )
+    );
+
 }
