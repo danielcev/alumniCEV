@@ -122,27 +122,31 @@ class Controller_Events extends Controller_Rest
         $type = $_GET['type'];
         try {
             
-            if ($type == 0 ) {
-                $query = \DB::query('SELECT events.* FROM belong 
-                                        JOIN users ON users.id = '.$id.' 
-                                        JOIN groups ON groups.id = belong.id_group 
-                                        JOIN asign ON asign.id_group = belong.id_group 
-                                        JOIN events ON events.id = asign.id_event'
-                                        )->as_assoc()->execute();
-                
-
-            }else{
+            if ($type == 0 ) 
+            {
+                $query = \DB::query('SELECT events.*,types.name FROM belong
+                    JOIN users ON belong.id_user = users.id
+                    JOIN groups ON groups.id = belong.id_group
+                    JOIN asign ON asign.id_group = groups.id
+                    JOIN events ON events.id = asign.id_event
+                    JOIN types ON types.id = events.id_type
+                    WHERE users.id = '.$id)->as_assoc()->execute();
+            }
+            else
+            {
                 $typeDB = Model_Types::find($type);
                 if ($typeDB == null) {
                     return $this->createResponse(400, 'Parametro type no valido');
                 }
-                $query = \DB::query('SELECT events.* FROM belong 
-                                        JOIN users ON users.id = '.$id.' 
-                                        JOIN groups ON groups.id = belong.id_group 
-                                        JOIN asign ON asign.id_group = belong.id_group 
+                $query = \DB::query('SELECT events.*,types.name FROM belong
+                                        JOIN users ON belong.id_user = users.id
+                                        JOIN groups ON groups.id = belong.id_group
+                                        JOIN asign ON asign.id_group = groups.id
                                         JOIN events ON events.id = asign.id_event
-                                        WHERE events.id_type='.$type.''
-                                        )->as_assoc()->execute();
+                                        JOIN types ON types.id = events.id_type
+                                        WHERE users.id = '.$id.'
+                                        AND 
+                                        events.id_type ='.$type)->as_assoc()->execute();
 
             }
             if (count($query) == 0) {
@@ -302,7 +306,7 @@ class Controller_Events extends Controller_Rest
             $query->join('events');
             $query->on('events.id','=','asign.id_event');
             $query->where('event.description','LIKE',$search);
-*/
+            */
 
             $query = \DB::query('SELECT events.* FROM belong 
                                         JOIN users ON users.id = '.$id.' 
@@ -311,6 +315,16 @@ class Controller_Events extends Controller_Rest
                                         JOIN events ON events.id = asign.id_event
                                         WHERE events.title LIKE '.$search.' OR events.description LIKE '.$search
                                         )->as_assoc()->execute();
+            $query = \DB::query('SELECT events.* FROM belong
+                                    JOIN users ON belong.id_user = users.id
+                                    JOIN groups ON groups.id = belong.id_group
+                                    JOIN asign ON asign.id_group = groups.id
+                                    JOIN events ON events.id = asign.id_event
+                                    WHERE users.id = 1
+                                    AND
+                                    events.title LIKE '.$search.'
+                                    OR
+                                    events.description LIKE'.$search)->as_assoc()->execute();
 
 
             /*
@@ -320,7 +334,7 @@ class Controller_Events extends Controller_Rest
                 ),
             )); */
 
-            if (count($query) == 0) {
+            if ($query == null) {
                 return $this->createResponse(400, 'No existen eventos');
             }
 
