@@ -308,19 +308,12 @@ class Controller_Events extends Controller_Rest
             $query->where('event.description','LIKE',$search);
             */
 
-            $query = \DB::query('SELECT events.* FROM belong 
-                                        JOIN users ON users.id = '.$id.' 
-                                        JOIN groups ON groups.id = belong.id_group 
-                                        JOIN asign ON asign.id_group = belong.id_group 
-                                        JOIN events ON events.id = asign.id_event
-                                        WHERE events.title LIKE '.$search.' OR events.description LIKE '.$search
-                                        )->as_assoc()->execute();
             $query = \DB::query('SELECT events.* FROM belong
                                     JOIN users ON belong.id_user = users.id
                                     JOIN groups ON groups.id = belong.id_group
                                     JOIN asign ON asign.id_group = groups.id
                                     JOIN events ON events.id = asign.id_event
-                                    WHERE users.id = 1
+                                    WHERE users.id = '.$id.'
                                     AND
                                     events.title LIKE '.$search.'
                                     OR
