@@ -320,7 +320,7 @@ class Controller_Events extends Controller_Rest
                 ),
             )); */
 
-            if ($query == null) {
+            if (count($query) == 0) {
                 return $this->createResponse(400, 'No existen eventos');
             }
 
