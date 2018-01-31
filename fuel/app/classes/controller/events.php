@@ -293,8 +293,16 @@ class Controller_Events extends Controller_Rest
 
         $search = $_GET['search'];
         $search = '"%'.$search.'%"';
+
+        if (empty($_GET['type'])) 
+        {
+          return $this->createResponse(400, 'Falta parámetros obligatorios (type, 0 -> todos, 1-> eventos, 2-> ofertas trabajo, 3 -> notificaciones, 4 -> noticias) ');
+        }
+
+        $type = $_GET['type'];
    
-        try {
+        try 
+        {
             /*
             $query = DB::select()->from('belong');
             $query->join('users');
@@ -307,7 +315,9 @@ class Controller_Events extends Controller_Rest
             $query->on('events.id','=','asign.id_event');
             $query->where('event.description','LIKE',$search);
             */
-
+            if ($type == 0 ) 
+            {
+            
             $query = \DB::query('SELECT events.* FROM belong
                                     JOIN users ON belong.id_user = users.id
                                     JOIN groups ON groups.id = belong.id_group
@@ -318,16 +328,30 @@ class Controller_Events extends Controller_Rest
                                     events.title LIKE '.$search.'
                                     OR
                                     events.description LIKE'.$search)->as_assoc()->execute();
+            }
+            else
+            {
+                $typeDB = Model_Types::find($type);
+                if ($typeDB == null) {
+                    return $this->createResponse(400, 'Parametro type no valido');
+                }
+                $query = \DB::query('SELECT events.* FROM belong
+                                    JOIN users ON belong.id_user = users.id
+                                    JOIN groups ON groups.id = belong.id_group
+                                    JOIN asign ON asign.id_group = groups.id
+                                    JOIN events ON events.id = asign.id_event
+                                    WHERE users.id = '.$id.'
+                                    AND
+                                    events.id_type = '.$type.'
+                                    AND
+                                    (events.title LIKE '.$search.'
+                                    OR
+                                    events.description LIKE'.$search.')'
+                                    )->as_assoc()->execute();
 
-
-            /*
-            $eventsDB = Model_Events::find('all', array(
-            'where' => array(
-                array('description' ,'LIKE' ,'%'.$search.'%'),'or' => array(array('title' ,'LIKE' ,'%'.$search.'%'))
-                ),
-            )); */
-
-            if ($query == null) {
+            }
+            if (count($query) == 0 )
+            {
                 return $this->createResponse(400, 'No existen eventos');
             }
 
