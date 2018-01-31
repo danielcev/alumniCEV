@@ -72,38 +72,38 @@ class Controller_Events extends Controller_Rest
             if (!empty($_POST['url'])) {
                 $eventDB->url = $_POST['url'];
             }
-
-            // foto
-            // Custom configuration for this upload
-            $config = array(
-                'path' => DOCROOT . 'assets/img',
-                'randomize' => true,
-                'ext_whitelist' => array('img', 'jpg', 'jpeg', 'gif', 'png'),
-            );
-            // process the uploaded files in $_FILES
-            Upload::process($config);
-            // if there are any valid files
-            if (Upload::is_valid())
-            {
-                // save them according to the config
-                Upload::save();
-                foreach(Upload::get_files() as $file)
+            if (!empty($_FILES['image'])) {
+                // foto
+                // Custom configuration for this upload
+                $config = array(
+                    'path' => DOCROOT . 'assets/img',
+                    'randomize' => true,
+                    'ext_whitelist' => array('img', 'jpg', 'jpeg', 'gif', 'png'),
+                );
+                // process the uploaded files in $_FILES
+                Upload::process($config);
+                // if there are any valid files
+                if (Upload::is_valid())
                 {
-                    //$eventDB->image = 'http://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].'/alumniCEV/public/assets/img/'.$file['saved_as'];
-                    $eventDB->image = $this->urlPro.$file['saved_as'];
+                    // save them according to the config
+                    Upload::save();
+                    foreach(Upload::get_files() as $file)
+                    {
+                        //$eventDB->image = 'http://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].'/alumniCEV/public/assets/img/'.$file['saved_as'];
+                        $eventDB->image = $this->urlPro.$file['saved_as'];
+                    }
+                }
+                // and process any errors
+                foreach (Upload::get_errors() as $file)
+                {
+                    return $this->response(array(
+                        'code' => 500,
+                    ));
                 }
             }
-            // and process any errors
-            foreach (Upload::get_errors() as $file)
-            {
-                return $this->response(array(
-                    'code' => 500,
-                ));
-            }
-
+            
 
             $eventDB->id_user = $user->data->id;
-
             $eventDB->save();
             foreach ($array_id_group as $key => $idGroup) 
             {
@@ -145,12 +145,13 @@ class Controller_Events extends Controller_Rest
 
         $user = $this->decodeToken();
         $id= $user->data->id;
-        if (empty($_GET['type'])) 
+        if (!isset($_GET['type']) )
         {
           return $this->createResponse(400, 'Falta parámetros obligatorios (type, 0 -> todos, 1-> eventos, 2-> ofertas trabajo, 3 -> notificaciones, 4 -> noticias) ');
         }
 
         $type = $_GET['type'];
+
         try {
             
             if ($type == 0 ) 
