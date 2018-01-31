@@ -32,4 +32,5 @@ desktop.ini
 /fuel/app/cache/*/*
 /fuel/app/config/crypt.php
 
-/fuel/app/config/development
+/fuel/app/config/development/
+/fuel/app/public/assets/img/

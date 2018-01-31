@@ -8,9 +8,9 @@ class Events
     {
         \DBUtil::create_table('events', array(
             'id' => array('type' => 'int', 'constraint' => 5, 'auto_increment' => true),
-            'title' => array('type' => 'varchar', 'constraint' => 100),
-            'description' => array('type' => 'varchar', 'constraint' => 100),
-            'image' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
+            'title' => array('type' => 'varchar', 'constraint' => 250),
+            'description' => array('type' => 'varchar', 'constraint' => 2500),
+            'image' => array('type' => 'varchar', 'constraint' => 250, 'null' => true),
             'lat' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
             'lon' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
             'date' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),

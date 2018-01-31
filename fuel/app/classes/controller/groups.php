@@ -188,6 +188,7 @@ class Controller_Groups extends Controller_Rest
             return $this->createResponse(500, $e->getMessage());
         }
     }
+    
     function post_unassign()
     {
         if (!isset(apache_request_headers()['Authorization']))

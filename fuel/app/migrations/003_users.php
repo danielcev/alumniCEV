@@ -17,7 +17,7 @@ class Users
             'id_rol' => array('type' => 'int', 'constraint' => 5, 'null' => true),
             'id_privacity' => array('type' => 'int', 'constraint' => 5, 'null' => true),
             'description' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
-            'photo' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
+            'photo' => array('type' => 'varchar', 'constraint' => 250, 'null' => true),
             'name' => array('type' => 'varchar', 'constraint' => 100, 'null' => true),
             'lon' => array('type' => 'float', 'constraint' => 25, 'null' => true),
             'lat' => array('type' => 'float', 'constraint' => 25, 'null' => true),
