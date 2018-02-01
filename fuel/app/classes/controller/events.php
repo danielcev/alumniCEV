@@ -225,12 +225,14 @@ class Controller_Events extends Controller_Rest
                 return $this->createResponse(400, 'No existe el evento');
 
             }
-
-            // TODO sacar los 3 comentarios y devolverlos --------------------------------------------------------------------------
+/*
             $commentsBD = Model_Comments::find('all',array('rows_limit' => 3),
                 array('where' => array(array('id_event' ,$id)))
+            );*/
+            //todo sacar solo 3 comments
+            $commentsBD = Model_Comments::find('all',
+                array('where' => array(array('id_event' ,$id)))
             );
-            //$commentsBD = Arr::reindex($commentsBD)
 
             foreach ($commentsBD as $key => $comment) {
                 $userBD = Model_Users::find($comment->id_user);
