@@ -423,12 +423,15 @@ class Controller_Users extends Controller_Rest
 
           foreach ($users as $keyUsers => $user) 
           {
+
               foreach ($user->roles as $keyRoles => $value) {
-                  $users[$keyUsers]['rol'] = $value->type;
+
+                  $users[$keyUsers][$keyRoles] = $value;
                   unset($users[$keyUsers]['roles']);
               }
               
           }
+
           return $this->createResponse(200, 'Usuarios devueltos', Arr::reindex($users));
           exit;   
     }

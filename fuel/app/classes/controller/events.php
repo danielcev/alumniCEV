@@ -60,9 +60,6 @@ class Controller_Events extends Controller_Rest
 
             $eventDB->id_type = $id_type;
 
-            if (!empty($_POST['image'])) {
-            	$eventDB->image = $_POST['image'];
-            }
             if (!empty($_POST['lat'])) {
             	$eventDB->lat = $_POST['lat'];
             }
@@ -72,6 +69,9 @@ class Controller_Events extends Controller_Rest
             if (!empty($_POST['url'])) {
                 $eventDB->url = $_POST['url'];
             }
+            return $this->createResponse(200, $_POST);
+            return;
+
             if (!empty($_FILES['image'])) {
                 // foto
                 // Custom configuration for this upload
@@ -96,9 +96,7 @@ class Controller_Events extends Controller_Rest
                 // and process any errors
                 foreach (Upload::get_errors() as $file)
                 {
-                    return $this->response(array(
-                        'code' => 500,
-                    ));
+                    return $this->createResponse(500, 'Error al subir la imagen');
                 }
             }
             
