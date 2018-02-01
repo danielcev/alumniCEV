@@ -7,7 +7,7 @@ class Controller_Events extends Controller_Rest
     private $key = 'my_secret_key';
     protected $format = 'json';
     private $urlPro = 'http://h2744356.stratoserver.net/solfamidas/alumniCEV/public/index.php/assets/img/';
-    private $urlDev = 'http://localhost:8888/alumniCEV/public/assets/img/';
+    private $urlDev = 'http://localhost:8080/alumniCEV/public/assets/img/';
 
     function post_create()
     {
@@ -69,9 +69,8 @@ class Controller_Events extends Controller_Rest
             if (!empty($_POST['url'])) {
                 $eventDB->url = $_POST['url'];
             }
-            return $this->createResponse(200, $_POST);
-            return;
 
+            //return $this->createResponse(500, 'files', $_FILES);
             if (!empty($_FILES['image'])) {
                 // foto
                 // Custom configuration for this upload
@@ -96,7 +95,7 @@ class Controller_Events extends Controller_Rest
                 // and process any errors
                 foreach (Upload::get_errors() as $file)
                 {
-                    return $this->createResponse(500, 'Error al subir la imagen');
+                    return $this->createResponse(500, 'Error al subir la imagen', $file);
                 }
             }
             
