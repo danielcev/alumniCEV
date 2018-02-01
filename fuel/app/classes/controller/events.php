@@ -6,12 +6,11 @@ class Controller_Events extends Controller_Rest
 {
     private $key = 'my_secret_key';
     protected $format = 'json';
-    private $urlPro = 'http://h2744356.stratoserver.net/solfamidas/alumniCEV/public/index.php/assets/img/';
+    private $urlPro = 'http://h2744356.stratoserver.net/solfamidas/alumniCEV/public/assets/img/';
     private $urlDev = 'http://localhost:8080/alumniCEV/public/assets/img/';
 
     function post_create()
     {
-        
         // falta token
         if (!isset(apache_request_headers()['Authorization']))
         {
@@ -159,7 +158,8 @@ class Controller_Events extends Controller_Rest
                     JOIN asign ON asign.id_group = groups.id
                     JOIN events ON events.id = asign.id_event
                     JOIN types ON types.id = events.id_type
-                    WHERE users.id = '.$id)->as_assoc()->execute();
+                    WHERE users.id = '.$id.'.
+                    ORDER BY events.id DESC')->as_assoc()->execute();
             }
             else
             {
@@ -175,7 +175,8 @@ class Controller_Events extends Controller_Rest
                                         JOIN types ON types.id = events.id_type
                                         WHERE users.id = '.$id.'
                                         AND 
-                                        events.id_type ='.$type)->as_assoc()->execute();
+                                        events.id_type ='.$type.'
+                                        ORDER BY events.id DESC')->as_assoc()->execute();
 
             }
             if (count($query) == 0) {
@@ -323,7 +324,7 @@ class Controller_Events extends Controller_Rest
         $search = $_GET['search'];
         $search = '"%'.$search.'%"';
 
-        if (empty($_GET['type'])) 
+        if (!isset($_GET['type']) )
         {
           return $this->createResponse(400, 'Falta parámetros obligatorios (type, 0 -> todos, 1-> eventos, 2-> ofertas trabajo, 3 -> notificaciones, 4 -> noticias) ');
         }
@@ -356,7 +357,8 @@ class Controller_Events extends Controller_Rest
                                     AND
                                     events.title LIKE '.$search.'
                                     OR
-                                    events.description LIKE'.$search)->as_assoc()->execute();
+                                    events.description LIKE'.$search.'
+                                    ORDER BY events.id DESC')->as_assoc()->execute();
             }
             else
             {
@@ -375,7 +377,8 @@ class Controller_Events extends Controller_Rest
                                     AND
                                     (events.title LIKE '.$search.'
                                     OR
-                                    events.description LIKE'.$search.')'
+                                    events.description LIKE'.$search.')
+                                    ORDER BY events.id DESC'
                                     )->as_assoc()->execute();
 
             }
