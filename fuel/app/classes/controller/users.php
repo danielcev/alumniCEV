@@ -436,6 +436,223 @@ class Controller_Users extends Controller_Rest
           exit;   
     }
 
+    function get_request()
+    {
+
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+
+        $jwt = apache_request_headers()['Authorization'];
+
+        // validar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+
+          //$users = Model_Users::find('all');
+          $users = Model_Users::query()->related('roles')->get();
+
+          foreach ($users as $keyUsers => $user) 
+          {
+
+              foreach ($user->roles as $keyRoles => $value) {
+
+                  $users[$keyUsers][$keyRoles] = $value;
+                  unset($users[$keyUsers]['roles']);
+              }
+              
+          }
+
+          return $this->createResponse(200, ' Peticiones realizadas', Arr::reindex($users));
+          exit;   
+    }
+    function post_sendRequest()
+    {
+    // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+        $user = $this->decodeToken();
+
+        if (empty($_POST['id_user'])) 
+        {
+          return $this->createResponse(400, 'Falta parámetros obligatorios (id_user) ');
+        }
+        $id_user = $_POST['id_user'];
+
+        try {
+            
+            
+            $userBD = Model_Users::find('first', array(
+            'where' => array(
+                array('id', $id_user),
+                ),
+            )); 
+
+            if ($userBD == null) {
+                return $this->createResponse(400, 'No existe el usuario');
+            }
+
+            $props = array('id_user_receive' => $id_user,'id_user_send' => $user->data->id ,'state' => 1);
+
+            $newfriend = new Model_Friends($props);
+            $newfriend->save();
+
+        return $this->createResponse(200, 'Peticion enviada',['user' => $userBD]);
+
+        } catch (Exception $e) 
+        {
+            if($e->getCode() == 23000){
+                return $this->createResponse(400, 'Ya existe una petición existente entre ambos usuarios');
+            }
+
+            return $this->createResponse(500, $e->getMessage());
+        }
+    
+
+    }
+
+function post_responseRequest()
+    {
+    // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+        $user = $this->decodeToken();
+
+        if (empty($_POST['type']) || empty($_POST['id_user'])) 
+        {
+          return $this->createResponse(400, 'Falta parámetros obligatorios (id_user o type) ');
+        }
+
+        if ($_POST['type'] != 2 && $_POST['type'] != 3) {
+            return $this->createResponse(400, 'El tipo enviado no es valido');
+        }
+
+        $id_user = $_POST['id_user'];
+        $type = $_POST['type'];
+
+        try {
+            
+            
+            $friend = Model_Friends::find('first', array(
+            'where' => array(
+                array('id_user_receive', $user->data->id),
+                array('id_user_send', $id_user),
+                array('state',1)
+                ),
+            )); 
+
+            if ($friend == null) {
+                return $this->createResponse(400, 'No es posible dejar de seguir al usuario');
+            }
+
+            $friend->state=$type;
+            $friend->save();
+
+            if ($type==2) {
+                return $this->createResponse(200, 'Solicitud Aceptada');
+            }else{
+                return $this->createResponse(200, 'Solicitud Denegada');
+            }
+
+        
+
+        } catch (Exception $e) 
+        {
+            if($e->getCode() == 23000){
+                return $this->createResponse(400, 'Ya existe una petición existente entre ambos usuarios');
+            }
+
+            return $this->createResponse(500, $e->getMessage());
+        }
+    
+
+    }
+
+    function post_deleteFriend()
+    {
+    // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+        $user = $this->decodeToken();
+
+        if (empty($_POST['id_user'])) 
+        {
+          return $this->createResponse(400, 'Falta parámetros obligatorios (id_user) ');
+        }
+        $id_user = $_POST['id_user'];
+
+        try {
+            
+            
+            $userBD = Model_Users::find('first', array(
+            'where' => array(
+                array('id', $id_user),
+                ),
+            )); 
+
+            if ($userBD == null) {
+                return $this->createResponse(400, 'No existe el usuario');
+            }
+
+            $props = array('id_user_receive' => $id_user,'id_user_send' => $user->data->id ,'state' => 1);
+
+            $newfriend = new Model_Friends($props);
+            $newfriend->save();
+
+        return $this->createResponse(200, 'Peticion enviada',['user' => $userBD]);
+
+        } catch (Exception $e) 
+        {
+            if($e->getCode() == 23000){
+                return $this->createResponse(400, 'Ya existe una petición existente entre ambos usuarios');
+            }
+
+            return $this->createResponse(500, $e->getMessage());
+        }
+    
+
+    }
+
     function get_user()
     {
         // falta token
@@ -479,6 +696,39 @@ class Controller_Users extends Controller_Rest
         } catch (Exception $e) 
         {
             return $this->createResponse(500, $e->getMessage());
+        }
+    }
+
+    function get_userbyid()
+    {
+        $jwt = apache_request_headers()['Authorization'];
+
+        if($this->validateToken($jwt))
+        {
+
+
+        if (empty($_GET['id']))
+        {
+            return $this->createResponse(400, 'Parámetros incorrectos');
+        }
+
+            $id = $_GET['id'];
+
+            $userDB = Model_Users::find($id);
+
+            if($userDB != null)
+            {
+                $this->createResponse(200, 'Usuario devuelto', ['user' => $userDB]);
+            }
+            else
+            {
+                $this->createResponse(500, 'Error en el servidor');
+            }
+
+        }
+        else
+        {
+            $this->createResponse(400, 'No tienes permiso para realizar esta acción');
         }
     }
 
@@ -541,31 +791,7 @@ class Controller_Users extends Controller_Rest
         return $json;
     }
 /*
-    function get_user()
-    {
-        $jwt = apache_request_headers()['Authorization'];
-
-        if($this->validateToken($jwt))
-        {
-
-            $id = $_GET['id'];
-            $userDB = Model_Users::find($id);
-
-            if($userDB != null)
-            {
-                $this->createResponse(200, 'Usuario devuelto', ['user' => $userDB]);
-            }
-            else
-            {
-                $this->createResponse(500, 'Error en el servidor');
-            }
-
-        }
-        else
-        {
-            $this->createResponse(400, 'No tienes permiso para realizar esta acción');
-        }
-    }
+    
 
 
     

@@ -11,6 +11,11 @@ class Model_Friends extends Orm\Model
         'id_user_send' => array(
             'data_type' => 'int'
         ),
+        'state' => array(
+            'data_type' => 'int'
+        )
     );
+
+	protected static $_primary_key = array('id_user_receive' , 'id_user_send');
 
 }
