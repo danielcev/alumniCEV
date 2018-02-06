@@ -447,6 +447,13 @@ class Controller_Users extends Controller_Rest
 
         $jwt = apache_request_headers()['Authorization'];
 
+        $user = $this->decodeToken();   
+
+        if (empty($_GET['id_user'])) 
+        {
+          return $this->createResponse(400, 'Falta parámetros obligatorios (id_user) ');
+        }
+        $id_user = $_GET['id_user'];
         // validar token
         try {
 
@@ -456,23 +463,22 @@ class Controller_Users extends Controller_Rest
             return $this->createResponse(400, 'Error de autentificacion');
         }
 
-          //$users = Model_Users::find('all');
-          $users = Model_Users::query()->related('roles')->get();
+        $friend = Model_Friends::find('first', array(
+                        'where' => array(
+                            array('id_user_send', $user->data->id),
+                            array('id_user_receive', $id_user),
+                            'or' => array(
+                            array('id_user_send', $id_user),
+                            array('id_user_receive', $user->data->id)
+                        )
+                        ),
+                        
+                        )); 
 
-          foreach ($users as $keyUsers => $user) 
-          {
-
-              foreach ($user->roles as $keyRoles => $value) {
-
-                  $users[$keyUsers][$keyRoles] = $value;
-                  unset($users[$keyUsers]['roles']);
-              }
-              
-          }
-
-          return $this->createResponse(200, ' Peticiones realizadas', Arr::reindex($users));
+          return $this->createResponse(200, ' Peticiones mostrada', $friend);
           exit;   
     }
+
     function post_sendRequest()
     {
     // falta token
@@ -554,6 +560,7 @@ function post_responseRequest()
 
         if ($_POST['type'] != 2 && $_POST['type'] != 3) {
             return $this->createResponse(400, 'El tipo enviado no es valido');
+
         }
 
         $id_user = $_POST['id_user'];
@@ -580,10 +587,11 @@ function post_responseRequest()
             if ($type==2) {
                 return $this->createResponse(200, 'Solicitud Aceptada');
             }else{
+                $friend->delete();
                 return $this->createResponse(200, 'Solicitud Denegada');
+                
             }
-
-        
+            
 
         } catch (Exception $e) 
         {
@@ -634,18 +642,29 @@ function post_responseRequest()
                 return $this->createResponse(400, 'No existe el usuario');
             }
 
-            $props = array('id_user_receive' => $id_user,'id_user_send' => $user->data->id ,'state' => 1);
+            $friend = Model_Friends::find('first', array(
+                        'where' => array(
+                            array('id_user_receive', $user->data->id),
+                            array('id_user_send', $id_user),
+                            array('state',2)
+                            ),
+                        'or' => array(
+                            array('id_user_receive', $id_user),
+                            array('id_user_send', $user->data->id),
+                            array('state',2))
+                        )); 
 
-            $newfriend = new Model_Friends($props);
-            $newfriend->save();
+            if($friend == null){
+                return $this->createResponse(400, 'No se puede dejar de seguir al usuario');
+            }
+            
+            $friend->delete();
 
-        return $this->createResponse(200, 'Peticion enviada',['user' => $userBD]);
+        return $this->createResponse(200, 'Ya no es Amig',['user' => $userBD]);
 
         } catch (Exception $e) 
         {
-            if($e->getCode() == 23000){
-                return $this->createResponse(400, 'Ya existe una petición existente entre ambos usuarios');
-            }
+            
 
             return $this->createResponse(500, $e->getMessage());
         }
