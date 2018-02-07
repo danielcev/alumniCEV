@@ -463,7 +463,7 @@ class Controller_Users extends Controller_Rest
             return $this->createResponse(400, 'Error de autentificacion');
         }
 
-        $friend = Model_Friends::find('first', array(
+        $friend = Model_Friends::find('firsts', array(
                         'where' => array(
                             array('id_user_send', $user->data->id),
                             array('id_user_receive', $id_user),
