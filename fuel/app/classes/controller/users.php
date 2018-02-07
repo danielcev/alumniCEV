@@ -18,6 +18,10 @@ class Controller_Users extends Controller_Rest
               return $this->createResponse(400, 'Parámetros incorrectos ( email, password)');
             }
 
+            if(strlen($_POST['password']) < 5 || strlen($_POST['password']) > 12){
+                return $this->createResponse(400, 'La contraseña tiene una longitud no válida.');
+            }
+
             $email = $_POST['email'];
             $password = $_POST['password'];
 
@@ -231,8 +235,6 @@ class Controller_Users extends Controller_Rest
             $email = $_POST['email'];
             $password = $_POST['password'];
 
-            
-
             $userDB = Model_Users::find('first', array(
                'where' => array(
                    array('email', $email),
@@ -434,6 +436,46 @@ class Controller_Users extends Controller_Rest
 
           return $this->createResponse(200, 'Usuarios devueltos', Arr::reindex($users));
           exit;   
+    }
+    function get_friends()
+    {
+
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+
+        $jwt = apache_request_headers()['Authorization'];
+
+        // validar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+
+        $user = $this->decodeToken();
+        $id = $user->data->id;
+
+        $query = \DB::query('SELECT * FROM users
+                                        JOIN friend ON friend.id_user_send = '.$id.'
+                                        AND users.id = friend.id_user_receive
+                                        WHERE friend.state = 2
+                                        UNION 
+                                        SELECT * FROM users
+                                        JOIN friend ON friend.id_user_receive = '.$id.'
+                                        AND users.id = friend.id_user_send
+                                        WHERE friend.state = 2
+                                        ')->as_assoc()->execute();
+
+        if(count($query) == 0){
+            return $this->createResponse(400, 'El usuario no tiene amigos');
+        }
+
+          return $this->createResponse(200, 'Amigos devueltos', $query);
     }
 
     function get_request()
