@@ -183,7 +183,7 @@ class Controller_Events extends Controller_Rest
                 return $this->createResponse(400, 'Listado de eventos vacio');
             }
 
-            return $this->createResponse(200, 'Listado de eventos', array_unique($query));
+            return $this->createResponse(200, 'Listado de eventos', array_unique($query, SORT_REGULAR));
 
         } catch (Exception $e) 
         {
