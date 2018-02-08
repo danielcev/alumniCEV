@@ -7,6 +7,9 @@ class Controller_Users extends Controller_Rest
     private $key = 'my_secret_key';
     protected $format = 'json';
 
+    private $urlPro = 'http://h2744356.stratoserver.net/solfamidas/alumniCEV/public/assets/img/';
+    private $urlDev = 'http://localhost:8080/alumniCEV/public/assets/img/';
+
     function post_create()
     {
 
@@ -334,9 +337,35 @@ class Controller_Users extends Controller_Rest
             if (!empty($_POST['description']) ) {
                 $userBD->description = $_POST['description'];
             }
-            if (!empty($_POST['photo']) ) {
-                $userBD->photo = $_POST['photo'];
+
+            if (!empty($_FILES['photo'])) {
+                // foto
+                // Custom configuration for this upload
+                $config = array(
+                    'path' => DOCROOT . 'assets/img',
+                    'randomize' => true,
+                    'ext_whitelist' => array('img', 'jpg', 'jpeg', 'gif', 'png'),
+                );
+                // process the uploaded files in $_FILES
+                Upload::process($config);
+                // if there are any valid files
+                if (Upload::is_valid())
+                {
+                    // save them according to the config
+                    Upload::save();
+                    foreach(Upload::get_files() as $file)
+                    {
+                        //$eventDB->image = 'http://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].'/alumniCEV/public/assets/img/'.$file['saved_as'];
+                        $userDB->photo = $this->urlPro.$file['saved_as'];
+                    }
+                }
+                // and process any errors
+                foreach (Upload::get_errors() as $file)
+                {
+                    return $this->createResponse(500, 'Error al subir la imagen', $file);
+                }
             }
+            
             if (!empty($_POST['id_rol']) ) {
                 $rolDB = Model_Roles::find($_POST['id_rol']);
                 if ($rolDB == null) {
