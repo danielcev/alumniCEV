@@ -356,7 +356,7 @@ class Controller_Users extends Controller_Rest
                     foreach(Upload::get_files() as $file)
                     {
                         //$eventDB->image = 'http://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].'/alumniCEV/public/assets/img/'.$file['saved_as'];
-                        $userDB->photo = $this->urlPro.$file['saved_as'];
+                        $userBD->photo = $this->urlPro.$file['saved_as'];
                     }
                 }
                 // and process any errors
