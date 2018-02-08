@@ -350,7 +350,7 @@ class Controller_Events extends Controller_Rest
             if ($type == 0 ) 
             {
             
-            $query = \DB::query('SELECT events.* FROM belong
+            $query = \DB::query('SELECT DISTINCT events.* FROM belong
                                     JOIN users ON belong.id_user = users.id
                                     JOIN groups ON groups.id = belong.id_group
                                     JOIN asign ON asign.id_group = groups.id
@@ -368,7 +368,7 @@ class Controller_Events extends Controller_Rest
                 if ($typeDB == null) {
                     return $this->createResponse(400, 'Parametro type no valido');
                 }
-                $query = \DB::query('SELECT events.* FROM belong
+                $query = \DB::query('SELECT DISTINCT events.* FROM belong
                                     JOIN users ON belong.id_user = users.id
                                     JOIN groups ON groups.id = belong.id_group
                                     JOIN asign ON asign.id_group = groups.id
