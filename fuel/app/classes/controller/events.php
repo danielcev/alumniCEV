@@ -152,7 +152,7 @@ class Controller_Events extends Controller_Rest
             
             if ($type == 0 ) 
             {
-                $query = \DB::query('SELECT events.*,types.name FROM belong
+                $query = \DB::query('SELECT DISTINCT events.*,types.name FROM belong
                     JOIN users ON belong.id_user = users.id
                     JOIN groups ON groups.id = belong.id_group
                     JOIN asign ON asign.id_group = groups.id
