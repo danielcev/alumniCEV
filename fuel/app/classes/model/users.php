@@ -46,6 +46,7 @@ class Model_Users extends Orm\Model
             'data_type' => 'varchar',
         ),
     );
+
     
     protected static $_belongs_to = array(
         'roles' => array(
@@ -71,13 +72,7 @@ class Model_Users extends Orm\Model
             'cascade_save' => true,
             'cascade_delete' => false,
         ),
-        'comments' => array(
-            'key_from' => 'id',
-            'model_to' => 'Model_Comments',
-            'key_to' => 'id_user',
-            'cascade_save' => true,
-            'cascade_delete' => false,
-        ),
+        'comments'
     );
 
 }

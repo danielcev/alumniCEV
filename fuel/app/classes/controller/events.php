@@ -236,7 +236,9 @@ class Controller_Events extends Controller_Rest
 
             foreach ($commentsBD as $key => $comment) {
                 $userBD = Model_Users::find($comment->id_user);
-                $comment['username']= $userBD->username;
+                $comment['username'] = $userBD->username;
+                $comment['id_user'] = $userBD->id;
+                $comment['photo'] = $userBD->photo;
             }
 
 
@@ -474,7 +476,9 @@ class Controller_Events extends Controller_Rest
             }
             foreach ($commentsBD as $key => $comment) {
                 $userBD = Model_Users::find($comment->id_user);
-                $comment['username']= $userBD->username;
+                $comment['username'] = $userBD->username;
+                $comment['id_user'] = $userBD->id;
+                $comment['photo'] = $userBD->photo;
             }
             return $this->createResponse(200, "Listado de comentarios", Arr::reindex($commentsBD));
 

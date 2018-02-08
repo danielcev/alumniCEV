@@ -23,20 +23,20 @@ class Model_Comments extends Orm\Model
     );
 
     protected static $_belongs_to = array(
-    'users' => array(
-        'key_from' => 'id_user',
-        'model_to' => 'Model_Users',
-        'key_to' => 'id',
-        'cascade_save' => true,
-        'cascade_delete' => true,
-        ),
     'events' => array(
         'key_from' => 'id_event',
         'model_to' => 'Model_Events',
         'key_to' => 'id',
         'cascade_save' => true,
         'cascade_delete' => true,
-        )
+        ),
+    'users' => array(
+            'key_from' => 'id',
+            'model_to' => 'Model_Users',
+            'key_to' => 'id_rol',
+            'cascade_save' => true,
+            'cascade_delete' => false,
+    )
     );
 
 }
