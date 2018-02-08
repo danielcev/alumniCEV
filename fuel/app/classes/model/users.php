@@ -71,8 +71,7 @@ class Model_Users extends Orm\Model
             'key_to' => 'id_user',
             'cascade_save' => true,
             'cascade_delete' => false,
-        ),
-        'comments'
+        )
     );
 
 }
