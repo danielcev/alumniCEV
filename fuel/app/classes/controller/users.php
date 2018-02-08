@@ -435,7 +435,49 @@ class Controller_Users extends Controller_Rest
           }
 
           return $this->createResponse(200, 'Usuarios devueltos', Arr::reindex($users));
-          exit;   
+           
+    }
+    function get_allusersapp()
+    {
+
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+
+        $jwt = apache_request_headers()['Authorization'];
+
+        
+
+
+        // validar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+        $id= $this->decodeToken($jwt)->data->id;
+          //$users = Model_Users::find('all');
+          $users = Model_Users::query()->related('roles')->get();
+
+          foreach ($users as $keyUsers => $user) 
+          {
+
+              foreach ($user->roles as $keyRoles => $value) {
+
+                  $users[$keyUsers][$keyRoles] = $value;
+                  unset($users[$keyUsers]['roles']);
+              }
+              
+          }
+
+          unset($users[$id]);
+
+          return $this->createResponse(200, 'Usuarios devueltos', Arr::reindex($users));
+            
     }
     function get_friends()
     {
