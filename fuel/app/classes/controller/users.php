@@ -543,7 +543,7 @@ class Controller_Users extends Controller_Rest
                                         ')->as_assoc()->execute();
 
         if(count($query) == 0){
-            return $this->createResponse(400, 'El usuario no tiene amigos');
+            return $this->createResponse(200, 'El usuario no tiene amigos');
         }
 
           return $this->createResponse(200, 'Amigos devueltos', $query);
