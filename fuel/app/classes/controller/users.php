@@ -589,7 +589,7 @@ class Controller_Users extends Controller_Rest
                         )); 
 
         if ($friend != null){
-            return $this->createResponse(200, 'Petición mostrada', $friend);
+            return $this->createResponse(200, 'Petición mostrada', array('request' => $friend));
         }else{
             return $this->createResponse(200, 'No hay petición entre los usuarios');
         }
@@ -628,7 +628,7 @@ class Controller_Users extends Controller_Rest
                         )); 
 
         if (count($friends) > 0){
-            return $this->createResponse(200, 'Peticiónes devueltas', $friends);
+            return $this->createResponse(200, 'Peticiónes devueltas', array('requests' => $friends));
         }else{
             return $this->createResponse(200, 'No hay petición entre los usuarios');
         }
