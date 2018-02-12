@@ -618,17 +618,18 @@ class Controller_Users extends Controller_Rest
 
         $user = $this->decodeToken();
 
-        $friends = Model_Friends::find('all', array(
-                        'where' => array(
-                            array('id_user_send', $user->data->id),
-                            'or' => array(
-                            array('id_user_receive', $user->data->id)
-                        )
-                        ),
-                        )); 
+
+        $friends = \DB::query('SELECT * FROM users
+                                        JOIN friend ON friend.id_user_send = '.$user->data->id.'
+                                        AND users.id = friend.id_user_receive
+                                        UNION 
+                                        SELECT * FROM users
+                                        JOIN friend ON friend.id_user_receive = '.$user->data->id.'
+                                        AND users.id = friend.id_user_send
+                                        ')->as_assoc()->execute();
 
         if (count($friends) > 0){
-            return $this->createResponse(200, 'Peticiónes devueltas', array('requests' => array_values($friends)));
+            return $this->createResponse(200, 'Peticiónes devueltas', array('requests' => $friends));
         }else{
             return $this->createResponse(200, 'No hay petición entre los usuarios');
         }
