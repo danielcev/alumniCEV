@@ -576,7 +576,7 @@ class Controller_Users extends Controller_Rest
             return $this->createResponse(400, 'Error de autentificacion');
         }
 
-        $friend = Model_Friends::find('firsts', array(
+        $friend = Model_Friends::find('first', array(
                         'where' => array(
                             array('id_user_send', $user->data->id),
                             array('id_user_receive', $id_user),
@@ -588,8 +588,51 @@ class Controller_Users extends Controller_Rest
                         
                         )); 
 
-          return $this->createResponse(200, ' Peticiones mostrada', $friend);
-          exit;   
+        if ($friend != null){
+            return $this->createResponse(200, 'Petición mostrada', $friend);
+        }else{
+            return $this->createResponse(200, 'No hay petición entre los usuarios');
+        }
+      
+    }
+
+    function get_requests()
+    {
+
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+
+        $jwt = apache_request_headers()['Authorization'];
+  
+        // validar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+
+        $user = $this->decodeToken();
+
+        $friends = Model_Friends::find('all', array(
+                        'where' => array(
+                            array('id_user_send', $user->data->id),
+                            'or' => array(
+                            array('id_user_receive', $user->data->id)
+                        )
+                        ),
+                        )); 
+
+        if (count($friends) > 0){
+            return $this->createResponse(200, 'Peticiónes devueltas', $friends);
+        }else{
+            return $this->createResponse(200, 'No hay petición entre los usuarios');
+        }
+      
     }
 
     function post_sendRequest()
