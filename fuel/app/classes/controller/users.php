@@ -63,6 +63,50 @@ class Controller_Users extends Controller_Rest
         }      
     }
 
+    function post_changepassword(){
+
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+        
+        $user = $this->decodeToken();
+
+        if(empty($_POST['lastpassword']) || $_POST['lastpassword'] == "" || empty($_POST['password']) || $_POST['password'] == ""){
+            return $this->createResponse(400, 'Faltan parámetros(lastpassword y/o password)');
+        }
+
+        $lastPassword = $_POST['lastpassword'];
+        $password = $_POST['password'];
+
+        $userDB = Model_Users('first', array(
+                   'where' => array(
+                       array('id', $user->data->id),
+                       array('password', $lastPassword)
+                       ),
+                   ));
+
+        if($userDB == null){
+            return $this->createResponse(400, 'La contraseña antigua no es válida');
+        }
+
+        $userDB->password = $password;
+        $userDB->save();
+
+        return $this->createResponse(200, 'Contraseña modificada', array('user' => $userDB));
+
+    }
+
     function post_insertUser()
     {
         // falta token
