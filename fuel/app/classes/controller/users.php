@@ -89,7 +89,7 @@ class Controller_Users extends Controller_Rest
         $lastPassword = $_POST['lastpassword'];
         $password = $_POST['password'];
 
-        $userDB = Model_Users('first', array(
+        $userDB = Model_Users::find('first', array(
                    'where' => array(
                        array('id', $user->data->id),
                        array('password', $lastPassword)
