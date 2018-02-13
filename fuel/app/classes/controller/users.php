@@ -274,7 +274,9 @@ class Controller_Users extends Controller_Rest
 
                 $jwt = JWT::encode($token, $this->key);
 
-                return $this->createResponse(200, 'login correcto', ['token' => $jwt, 'user' => $userDB]);
+                $privacity = Model_Privacity::find($userDB->id_privacity);
+
+                return $this->createResponse(200, 'login correcto', ['token' => $jwt, 'user' => $userDB, 'privacity' => $privacity]);
 
             }
             else
