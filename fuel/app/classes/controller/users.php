@@ -340,7 +340,7 @@ class Controller_Users extends Controller_Rest
                 $userBD->description = $_POST['description'];
             }
 
-            if (!empty($_POST['phoneprivacity']) && !empty($_POST['localizationprivacity'])) {
+            if (isset($_POST['phoneprivacity']) && isset($_POST['localizationprivacity'])) {
 
                 if ($_POST['phoneprivacity'] != 0 && $_POST['phoneprivacity'] != 1){
                     return $this->createResponse(400, 'Valor de phoneprivacity no válido, debe ser 0 ó 1');
