@@ -693,7 +693,7 @@ class Controller_Users extends Controller_Rest
                                         ')->as_assoc()->execute();
 
         if (count($friends) > 0){
-            return $this->createResponse(200, 'Peticiónes devueltas', array('requests' => array_reverse($friends)));
+            return $this->createResponse(200, 'Peticiónes devueltas', array('requests' => $friends));
         }else{
             return $this->createResponse(200, 'No hay peticiones de amistad');
         }
