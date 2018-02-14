@@ -689,12 +689,13 @@ class Controller_Users extends Controller_Rest
                                         SELECT * FROM users
                                         JOIN friend ON friend.id_user_receive = '.$user->data->id.'
                                         AND users.id = friend.id_user_send
+                                        
                                         ')->as_assoc()->execute();
 
         if (count($friends) > 0){
-            return $this->createResponse(200, 'Peticiónes devueltas', array('requests' => $friends));
+            return $this->createResponse(200, 'Peticiónes devueltas', array('requests' => array_reverse($friends)));
         }else{
-            return $this->createResponse(200, 'No hay petición entre los usuarios');
+            return $this->createResponse(200, 'No hay peticiones de amistad');
         }
       
     }
@@ -880,7 +881,7 @@ function post_responseRequest()
             
             $friend->delete();
 
-        return $this->createResponse(200, 'Ya no es Amig',['user' => $userBD]);
+        return $this->createResponse(200, 'Ya no es Amigo',['user' => $userBD]);
 
         } catch (Exception $e) 
         {
@@ -940,34 +941,52 @@ function post_responseRequest()
 
     function get_userbyid()
     {
-        $jwt = apache_request_headers()['Authorization'];
 
-        if($this->validateToken($jwt))
-        {
+        try {
 
+            $jwt = apache_request_headers()['Authorization'];
 
-        if (empty($_GET['id']))
-        {
-            return $this->createResponse(400, 'Parámetros incorrectos');
-        }
-
-            $id = $_GET['id'];
-
-            $userDB = Model_Users::find($id);
-
-            if($userDB != null)
+            if($this->validateToken($jwt))
             {
-                $this->createResponse(200, 'Usuario devuelto', ['user' => $userDB]);
-            }
+
+                if (empty($_GET['id']))
+                {
+                    return $this->createResponse(400, 'Parámetros incorrectos');
+                }
+
+                $user = $this->decodeToken();
+
+                $id = $_GET['id'];
+
+                $userDB = Model_Users::find($id);
+
+                if($userDB == null)
+                {
+                    return $this->createResponse(400, 'El usuario no existe');
+                }
+
+                $friend = Model_Friends::find('first', array(
+                        'where' => array(
+                            array('id_user_receive', $user->data->id),
+                            array('id_user_send', $id),
+                            'or' => array(
+                            array('id_user_receive', $id),
+                            array('id_user_send', $user->data->id)
+                            )
+                            ),
+                        ));
+
+                return $this->createResponse(200, 'Usuario devuelto', array('user' => $userDB, 'friend' => $friend));
+                
+                }
             else
             {
-                $this->createResponse(500, 'Error en el servidor');
+                $this->createResponse(400, 'No tienes permiso para realizar esta acción');
             }
 
-        }
-        else
+        } catch (Exception $e) 
         {
-            $this->createResponse(400, 'No tienes permiso para realizar esta acción');
+            return $this->createResponse(500, $e->getMessage());
         }
     }
 
