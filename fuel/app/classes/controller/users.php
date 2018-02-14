@@ -681,7 +681,6 @@ class Controller_Users extends Controller_Rest
 
         $user = $this->decodeToken();
 
-
         $friends = \DB::query('SELECT * FROM users
                                         JOIN friend ON friend.id_user_send = '.$user->data->id.'
                                         AND users.id = friend.id_user_receive
