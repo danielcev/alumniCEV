@@ -557,13 +557,10 @@ class Controller_Users extends Controller_Rest
 
           foreach ($users as $keyUsers => $user) 
           {
-
-              foreach ($user->roles as $keyRoles => $value) {
-
-                  $users[$keyUsers][$keyRoles] = $value;
-                  unset($users[$keyUsers]['roles']);
-              }
-              
+            if ($user->is_registered == 0) 
+            {
+                unset($users[$keyUsers]);
+            }              
           }
 
           unset($users[$id]);
@@ -1073,7 +1070,7 @@ class Controller_Users extends Controller_Rest
         }
 
         $search = $_GET['search'];
-
+        $search = "'%".$search."%'";
         try {
             
             
@@ -1085,9 +1082,9 @@ class Controller_Users extends Controller_Rest
                                     AND
                                     users.id != '.$user->data->id.'
                                     AND (
-                                        users.username = '.$search.'
+                                        users.username LIKE '.$search.'
                                         OR
-                                        users.name = '.$search.'
+                                        users.name LIKE '.$search.'
                                     )
                                     AND
                                     (
@@ -1098,7 +1095,6 @@ class Controller_Users extends Controller_Rest
             if (count($query) <1) {
                 return $this->createResponse(400, 'No hay usuarios');
             }
-            var_dump($query);
             return $this->createResponse(200, 'Listado de usuarios', $query);
 
         } catch (Exception $e) 
