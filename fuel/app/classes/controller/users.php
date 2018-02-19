@@ -755,7 +755,7 @@ class Controller_Users extends Controller_Rest
 
     }
 
-function post_responseRequest()
+    function post_responseRequest()
     {
     // falta token
         if (!isset(apache_request_headers()['Authorization']))
@@ -1047,6 +1047,66 @@ function post_responseRequest()
 
         return $json;
     }
+
+    function get_find_friend()
+    {
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+
+        $user = $this->decodeToken();
+        
+        if (empty($_GET['search'])) 
+        {
+          return $this->createResponse(400, 'Falta parámetros obligatorios (search) ');
+        }
+
+        $search = $_GET['search'];
+
+        try {
+            
+            
+            $query = \DB::query('SELECT DISTINCT users.* FROM users
+                                    JOIN friend
+                                    ON friend.id_user_send = users.id 
+                                    OR friend.id_user_receive = users.id
+                                    WHERE friend.state = 2
+                                    AND
+                                    users.id != '.$user->data->id.'
+                                    AND (
+                                        users.username = '.$search.'
+                                        OR
+                                        users.name = '.$search.'
+                                    )
+                                    AND
+                                    (
+                                        friend.id_user_send = '.$user->data->id.'
+                                        OR
+                                        friend.id_user_receive = '.$user->data->id.'
+                                        )')->as_assoc()->execute();
+            if (count($query) <1) {
+                return $this->createResponse(400, 'No hay usuarios');
+            }
+            var_dump($query);
+            return $this->createResponse(200, 'Listado de usuarios', $query);
+
+        } catch (Exception $e) 
+        {
+            return $this->createResponse(500, $e->getMessage());
+        }
+    }
+
 /*
     
 
@@ -1079,7 +1139,7 @@ function post_responseRequest()
 
         if($this->validateToken($jwt)){
           $id = $_POST['id'];
-          $username = $_POST['username'];
+          $search = $_POST['username'];
           $password = $_POST['password'];
 
           $usuario = Model_Users::find($id);
