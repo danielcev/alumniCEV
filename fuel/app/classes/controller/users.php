@@ -540,9 +540,6 @@ class Controller_Users extends Controller_Rest
 
         $jwt = apache_request_headers()['Authorization'];
 
-        
-
-
         // validar token
         try {
 
@@ -961,6 +958,8 @@ class Controller_Users extends Controller_Rest
                     return $this->createResponse(400, 'El usuario no existe');
                 }
 
+                $privacity = Model_Privacity::find($userDB->id_privacity);
+
                 $friend = Model_Friends::find('first', array(
                         'where' => array(
                             array('id_user_receive', $user->data->id),
@@ -972,7 +971,7 @@ class Controller_Users extends Controller_Rest
                             ),
                         ));
 
-                return $this->createResponse(200, 'Usuario devuelto', array('user' => $userDB, 'friend' => $friend));
+                return $this->createResponse(200, 'Usuario devuelto', array('user' => $userDB, 'privacity' => $privacity, 'friend' => $friend));
                 
                 }
             else
