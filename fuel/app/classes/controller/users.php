@@ -687,7 +687,7 @@ class Controller_Users extends Controller_Rest
         if (count($friends) > 0){
             return $this->createResponse(200, 'Peticiónes devueltas', array('requests' => $friends));
         }else{
-            return $this->createResponse(200, 'No hay peticiones de amistad');
+            return $this->createResponse(400, 'No hay peticiones de amistad');
         }
     }
 
