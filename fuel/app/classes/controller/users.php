@@ -954,9 +954,10 @@ class Controller_Users extends Controller_Rest
 
             $usersBD = Model_Users::find('all', array(
             'where' => array(
-                array('username' ,'LIKE' ,'%'.$search.'%'),
-                /*array('name' ,'LIKE' ,'%'.$search.'%'),*/
                 array('is_registered' ,1),
+                array('username' ,'LIKE' ,'%'.$search.'%'),
+                'or' =>
+                array('name' ,'LIKE' ,'%'.$search.'%'),
                 ),
             )); 
             if (count($usersBD) < 1) {
