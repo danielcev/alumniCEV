@@ -924,7 +924,7 @@ class Controller_Users extends Controller_Rest
             if ($usersBD == null) {
                 return $this->createResponse(400, 'No existe el usuario');
             }
-            return $this->createResponse(200, 'Listado de usuarios', $usersBD);
+            return $this->createResponse(200, 'Listado de usuarios', Arr::reindex($usersBD));
 
         } catch (Exception $e) 
         {
@@ -1072,7 +1072,6 @@ class Controller_Users extends Controller_Rest
         $search = "'%".$search."%'";
         try {
             
-            
             $query = \DB::query('SELECT DISTINCT users.* FROM users
                                     JOIN friend
                                     ON friend.id_user_send = users.id 
@@ -1091,7 +1090,7 @@ class Controller_Users extends Controller_Rest
                                         OR
                                         friend.id_user_receive = '.$user->data->id.'
                                         )')->as_assoc()->execute();
-            if (count($query) <1) {
+            if (count($query) < 1) {
                 return $this->createResponse(400, 'No hay usuarios');
             }
             return $this->createResponse(200, 'Listado de usuarios', $query);
