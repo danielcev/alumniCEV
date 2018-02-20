@@ -63,7 +63,8 @@ class Controller_Users extends Controller_Rest
         }      
     }
 
-    function post_changepassword(){
+    function post_changepassword()
+    {
 
         // falta token
         if (!isset(apache_request_headers()['Authorization']))
@@ -104,7 +105,6 @@ class Controller_Users extends Controller_Rest
         $userDB->save();
 
         return $this->createResponse(200, 'Contraseña modificada', array('user' => $userDB));
-
     }
 
     function post_insertUser()
@@ -650,7 +650,6 @@ class Controller_Users extends Controller_Rest
         }else{
             return $this->createResponse(200, 'No hay petición entre los usuarios');
         }
-      
     }
 
     function get_requests()
@@ -690,12 +689,11 @@ class Controller_Users extends Controller_Rest
         }else{
             return $this->createResponse(200, 'No hay peticiones de amistad');
         }
-      
     }
 
     function post_sendRequest()
     {
-    // falta token
+        // falta token
         if (!isset(apache_request_headers()['Authorization']))
         {
             return $this->createResponse(400, 'Token no encontrado');
@@ -745,13 +743,11 @@ class Controller_Users extends Controller_Rest
 
             return $this->createResponse(500, $e->getMessage());
         }
-    
-
     }
 
     function post_responseRequest()
     {
-    // falta token
+        // falta token
         if (!isset(apache_request_headers()['Authorization']))
         {
             return $this->createResponse(400, 'Token no encontrado');
@@ -816,12 +812,11 @@ class Controller_Users extends Controller_Rest
             return $this->createResponse(500, $e->getMessage());
         }
     
-
     }
 
     function post_deleteFriend()
     {
-    // falta token
+        // falta token
         if (!isset(apache_request_headers()['Authorization']))
         {
             return $this->createResponse(400, 'Token no encontrado');
@@ -882,8 +877,6 @@ class Controller_Users extends Controller_Rest
 
             return $this->createResponse(500, $e->getMessage());
         }
-    
-
     }
 
     function get_user()
@@ -925,6 +918,108 @@ class Controller_Users extends Controller_Rest
                 return $this->createResponse(400, 'No existe el usuario');
             }
             return $this->createResponse(200, 'Listado de usuarios', Arr::reindex($usersBD));
+
+        } catch (Exception $e) 
+        {
+            return $this->createResponse(500, $e->getMessage());
+        }
+    }
+    function get_finduserapp()
+    {
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+
+        $user = $this->decodeToken();
+        
+        if (empty($_GET['search'])) 
+        {
+          return $this->createResponse(400, 'Falta parámetros obligatorios (search) ');
+        }
+
+        $search = $_GET['search'];
+        //$search = "'%".$search."%'";
+        try {
+
+            $usersBD = Model_Users::find('all', array(
+            'where' => array(
+                array('username' ,'LIKE' ,'%'.$search.'%'),
+                /*array('name' ,'LIKE' ,'%'.$search.'%'),*/
+                array('is_registered' ,1),
+                ),
+            )); 
+            if (count($usersBD) < 1) {
+                return $this->createResponse(400, 'No hay usuarios');
+            }
+            return $this->createResponse(200, 'Listado de usuarios', $usersBD);
+
+        } catch (Exception $e) 
+        {
+            return $this->createResponse(500, $e->getMessage());
+        }
+    }
+
+    function get_find_friend()
+    {
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+
+        $user = $this->decodeToken();
+        
+        if (empty($_GET['search'])) 
+        {
+          return $this->createResponse(400, 'Falta parámetros obligatorios (search) ');
+        }
+
+        $search = $_GET['search'];
+        $search = "'%".$search."%'";
+        try {
+            
+            $query = \DB::query('SELECT DISTINCT users.* FROM users
+                                    JOIN friend
+                                    ON friend.id_user_send = users.id 
+                                    OR friend.id_user_receive = users.id
+                                    WHERE friend.state = 2
+                                    AND
+                                    users.id != '.$user->data->id.'
+                                    AND (
+                                        users.username LIKE '.$search.'
+                                        OR
+                                        users.name LIKE '.$search.'
+                                    )
+                                    AND
+                                    (
+                                        friend.id_user_send = '.$user->data->id.'
+                                        OR
+                                        friend.id_user_receive = '.$user->data->id.'
+                                        )')->as_assoc()->execute();
+            if (count($query) < 1) {
+                return $this->createResponse(400, 'No hay usuarios');
+            }
+            return $this->createResponse(200, 'Listado de usuarios', $query);
 
         } catch (Exception $e) 
         {
@@ -1044,62 +1139,7 @@ class Controller_Users extends Controller_Rest
         return $json;
     }
 
-    function get_find_friend()
-    {
-        // falta token
-        if (!isset(apache_request_headers()['Authorization']))
-        {
-            return $this->createResponse(400, 'Token no encontrado');
-        }
-        $jwt = apache_request_headers()['Authorization'];
-        // valdiar token
-        try {
 
-            $this->validateToken($jwt);
-        } catch (Exception $e) {
-
-            return $this->createResponse(400, 'Error de autentificacion');
-        }
-
-        $user = $this->decodeToken();
-        
-        if (empty($_GET['search'])) 
-        {
-          return $this->createResponse(400, 'Falta parámetros obligatorios (search) ');
-        }
-
-        $search = $_GET['search'];
-        $search = "'%".$search."%'";
-        try {
-            
-            $query = \DB::query('SELECT DISTINCT users.* FROM users
-                                    JOIN friend
-                                    ON friend.id_user_send = users.id 
-                                    OR friend.id_user_receive = users.id
-                                    WHERE friend.state = 2
-                                    AND
-                                    users.id != '.$user->data->id.'
-                                    AND (
-                                        users.username LIKE '.$search.'
-                                        OR
-                                        users.name LIKE '.$search.'
-                                    )
-                                    AND
-                                    (
-                                        friend.id_user_send = '.$user->data->id.'
-                                        OR
-                                        friend.id_user_receive = '.$user->data->id.'
-                                        )')->as_assoc()->execute();
-            if (count($query) < 1) {
-                return $this->createResponse(400, 'No hay usuarios');
-            }
-            return $this->createResponse(200, 'Listado de usuarios', $query);
-
-        } catch (Exception $e) 
-        {
-            return $this->createResponse(500, $e->getMessage());
-        }
-    }
 
 /*
     
