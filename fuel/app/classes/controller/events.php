@@ -68,6 +68,9 @@ class Controller_Events extends Controller_Rest
             if (!empty($_POST['url'])) {
                 $eventDB->url = $_POST['url'];
             }
+            // horario español
+            date_default_timezone_set('CET');
+            $eventDB->date = date('Y-m-d H:i:s');
 
             //return $this->createResponse(500, 'files', $_FILES);
             if (!empty($_FILES['image'])) {
@@ -118,6 +121,94 @@ class Controller_Events extends Controller_Rest
             } catch (Exception $e) {
                 return $this->createResponse(500, $e->getMessage());
             }
+        }
+    }
+
+    function post_update()
+    {
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+        // falta parametro 
+        if (empty($_POST['id']) ) {
+            return $this->createResponse(400, 'Falta parametro id');
+        }
+        $id = $_POST['id'];
+        //admin modifica todos y el usuario el suyo propio
+        $user = $this->decodeToken();
+        /*
+        if ($user->data->id_rol != 1 && $user->data->id != $id) {
+            return $this->createResponse(401, 'No autorizado');
+        }
+        */
+        
+        try {
+            
+            $eventDB = Model_Events::find($id);
+            if ($eventDB == null) {
+                return $this->createResponse(400, 'No existe el evento');
+            }
+
+            if (!empty($_POST['title']) ) {
+                $eventDB->title = $_POST['title'];
+            }
+            if (!empty($_POST['description']) ) {
+                $eventDB->description = $_POST['description'];
+            }
+            if (!empty($_POST['lat']) ) {
+                $eventDB->lat = $_POST['lat'];
+            }
+            if (!empty($_POST['lon']) ) {
+                $eventDB->lon = $_POST['lon'];
+            }
+            if (!empty($_POST['url']) ) {
+                $eventDB->url = $_POST['url'];
+            }
+            if (!empty($_FILES['image'])) {
+                // foto
+                // Custom configuration for this upload
+                $config = array(
+                    'path' => DOCROOT . 'assets/img',
+                    'randomize' => true,
+                    'ext_whitelist' => array('img', 'jpg', 'jpeg', 'gif', 'png'),
+                );
+                // process the uploaded files in $_FILES
+                Upload::process($config);
+                // if there are any valid files
+                if (Upload::is_valid())
+                {
+                    // save them according to the config
+                    Upload::save();
+                    foreach(Upload::get_files() as $file)
+                    {
+                        //$eventDB->image = 'http://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].'/alumniCEV/public/assets/img/'.$file['saved_as'];
+                        $eventDB->image = $this->urlPro.$file['saved_as'];
+                    }
+                }
+                // and process any errors
+                foreach (Upload::get_errors() as $file)
+                {
+                    return $this->createResponse(500, 'Error al subir la imagen', $file);
+                }
+            }
+
+            $eventDB->save();
+            return $this->createResponse(200, 'Evento actualizado');
+
+        } catch (Exception $e) 
+        {
+            return $this->createResponse(500, $e->getMessage());
         }
     }
 
@@ -225,7 +316,7 @@ class Controller_Events extends Controller_Rest
                 return $this->createResponse(400, 'No existe el evento');
 
             }
-/*
+            /*
             $commentsBD = Model_Comments::find('all',array('rows_limit' => 3),
                 array('where' => array(array('id_event' ,$id)))
             );*/
