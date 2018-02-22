@@ -54,6 +54,7 @@ class Model_Users extends Orm\Model
             'model_to' => 'Model_Roles',
             'key_to' => 'id',
             'cascade_save' => true,
+            // cuando borro un rol borro los usuarios
             'cascade_delete' => false,
         ),
         'privacity' => array(
@@ -61,7 +62,8 @@ class Model_Users extends Orm\Model
             'model_to' => 'Model_Privacity',
             'key_to' => 'id',
             'cascade_save' => true,
-            'cascade_delete' => true,
+            // cuando borro una privacidad borro el usuario
+            'cascade_delete' => false,
         )
     );
     protected static $_has_many = array(

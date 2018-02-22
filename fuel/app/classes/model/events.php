@@ -40,6 +40,7 @@ class Model_Events extends Orm\Model
             'model_to' => 'Model_Users',
             'key_to' => 'id',
             'cascade_save' => true,
+            // cuando borro evento borro usuario
             'cascade_delete' => false,
         ),
         'types' => array(
@@ -47,7 +48,8 @@ class Model_Events extends Orm\Model
             'model_to' => 'Model_Types',
             'key_to' => 'id',
             'cascade_save' => true,
-            'cascade_delete' => true,
+            // cuando borro evento borro tipo
+            'cascade_delete' => false,
         )
     );
     protected static $_has_many = array(

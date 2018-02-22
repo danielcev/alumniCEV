@@ -28,14 +28,16 @@ class Model_Comments extends Orm\Model
         'model_to' => 'Model_Events',
         'key_to' => 'id',
         'cascade_save' => true,
+        // cuando borro evento borro comentarios
         'cascade_delete' => true,
         ),
     'users' => array(
-            'key_from' => 'id',
-            'model_to' => 'Model_Users',
-            'key_to' => 'id_rol',
-            'cascade_save' => true,
-            'cascade_delete' => false,
+        'key_from' => 'id',
+        'model_to' => 'Model_Users',
+        'key_to' => 'id_rol',
+        'cascade_save' => true,
+        // cuando borro usuario borro comentarios
+        'cascade_delete' => true,
     )
     );
 
