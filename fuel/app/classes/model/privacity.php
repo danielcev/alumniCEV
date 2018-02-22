@@ -19,8 +19,8 @@ class Model_Privacity extends Orm\Model
         'model_to' => 'Model_Users',
         'key_to' => 'id_privacity',
         'cascade_save' => true,
-        // cuando se borra usuario se borra privacidad
-        'cascade_delete' => true,
+        // borrar usuario cuando borro privacidad
+        'cascade_delete' => false,
         )
     );
 
