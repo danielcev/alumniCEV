@@ -879,6 +879,66 @@ class Controller_Users extends Controller_Rest
         }
     }
 
+    function post_cancelRequest()
+    {
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+        $jwt = apache_request_headers()['Authorization'];
+        // valdiar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+        $user = $this->decodeToken();
+
+        if (empty($_POST['id_user'])) 
+        {
+          return $this->createResponse(400, 'Falta parámetros obligatorios (id_user) ');
+        }
+
+        $id_user = $_POST['id_user'];
+
+        try {
+            
+            $userBD = Model_Users::find('first', array(
+            'where' => array(
+                array('id', $id_user),
+                ),
+            )); 
+
+            if ($userBD == null) {
+                return $this->createResponse(400, 'No existe el usuario');
+            }
+
+            $friend = Model_Friends::find('first', array(
+                        'where' => array(
+                            array('id_user_send', $user->data->id),
+                            array('id_user_receive', $id_user),
+                            array('state',1)
+                            ))); 
+
+            if($friend == null){
+                return $this->createResponse(400, 'No has enviado una petición de amistad a este usuario');
+            }
+            
+            $friend->delete();
+
+            return $this->createResponse(200, 'Petición cancelada',['user' => $userBD]);
+
+        } catch (Exception $e) 
+        {
+            
+
+            return $this->createResponse(500, $e->getMessage());
+        }
+    }
+
     function get_user()
     {
         // falta token
