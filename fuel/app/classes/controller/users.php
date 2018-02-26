@@ -214,7 +214,7 @@ class Controller_Users extends Controller_Rest
             }
 
             if($userDB->$photo != null){
-                $imgUser = explode("/", $users->image[7]);
+                $imgUser = explode("/", $users->image[8]);
                 unlink(DOCROOT . 'asset/img' . $imgUser);               
             }
 

@@ -374,7 +374,7 @@ class Controller_Events extends Controller_Rest
 
                 if($event->image != null){
 
-                    $imgEvent = explode("/",$event->image)[7];
+                    $imgEvent = explode("/",$event->image)[8];
 
                     unlink(DOCROOT . 'assets/img/' . $imgEvent);
 
