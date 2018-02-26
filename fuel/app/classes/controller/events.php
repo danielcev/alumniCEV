@@ -7,7 +7,7 @@ class Controller_Events extends Controller_Rest
     private $key = 'my_secret_key';
     protected $format = 'json';
     private $urlPro = 'http://h2744356.stratoserver.net/solfamidas/alumniCEV/public/assets/img/';
-    private $urlDev = 'http://localhost:8080/alumniCEV/public/assets/img/';
+    private $urlDev = 'http://localhost:8888/alumniCEV/public/assets/img/';
 
     function post_create()
     {
@@ -30,12 +30,7 @@ class Controller_Events extends Controller_Rest
         // validar rol de admin
         $user = $this->decodeToken();
 
-        // --------------------------------------------------------
-        /* todo los usuarios pueden crear eventos, en un futuro no
-        if ($user->data->id_rol != 1) {
-            return $this->createResponse(401, 'No autorizado');
-        }*/
-        // falta parametro email
+
         if (empty($_POST['title']) || empty($_POST['description']) || empty($_POST['id_group'])|| empty($_POST['id_type'])) 
         {
 
@@ -376,13 +371,20 @@ class Controller_Events extends Controller_Rest
             }
 
             if ($event->id_user == $user->data->id || $user->data->id_rol == 1) {
+
+                if($event->image != null){
+
+                    $imgEvent = explode("/",$event->image)[7];
+
+                    unlink(DOCROOT . 'assets/img/' . $imgEvent);
+
+                }
+
                 $event->delete();
                 return $this->createResponse(200, 'Evento borrado');
             }else{
                 return $this->createResponse(401, 'No autorizado');
             }
-
-            
 
         } catch (Exception $e) 
         {

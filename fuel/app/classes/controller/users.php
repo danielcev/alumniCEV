@@ -1,4 +1,4 @@
-<?php
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <?php
 //require_once '../../../vendor/autoload.php';
 use Firebase\JWT\JWT;
 
@@ -212,6 +212,12 @@ class Controller_Users extends Controller_Rest
             {
                 return $this->createResponse(400, 'El usuario no existe');
             }
+
+            if($userDB->$photo != null){
+                $imgUser = explode("/", $users->image[7]);
+                unlink(DOCROOT . 'asset/img' . $imgUser);               
+            }
+
             $userDB->delete();
             //return $this->createResponse(400, $userDB);
             return $this->createResponse(200, 'Usuario borrado');
