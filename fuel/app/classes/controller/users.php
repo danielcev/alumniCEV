@@ -213,7 +213,7 @@ class Controller_Users extends Controller_Rest
                 return $this->createResponse(400, 'El usuario no existe');
             }
 
-            if($userDB->$photo != null){
+            if($userDB->photo != null){
                 $imgUser = explode("/", $users->image[8]);
                 unlink(DOCROOT . 'asset/img' . $imgUser);               
             }
