@@ -5,7 +5,7 @@
 
 // LOCAL
 
-/*
+
 return array(
 	'default' => array(
 		'connection'  => array(
@@ -18,10 +18,10 @@ return array(
 
 
 
-*/
+
 // PRODUCCION
 
-
+/*
 return array(
 	'default' => array(
 		'connection'  => array(
@@ -31,3 +31,4 @@ return array(
 		),
 	),
 );
+*/
