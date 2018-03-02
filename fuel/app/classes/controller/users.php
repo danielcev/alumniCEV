@@ -860,12 +860,12 @@ class Controller_Users extends Controller_Rest
                         'where' => array(
                             array('id_user_receive', $user->data->id),
                             array('id_user_send', $id_user),
-                            array('state',2)
+                            array('state',2),
+                            'or' => array(
+                                array('id_user_receive', $id_user),
+                                array('id_user_send', $user->data->id),
+                                array('state',2))
                             ),
-                        'or' => array(
-                            array('id_user_receive', $id_user),
-                            array('id_user_send', $user->data->id),
-                            array('state',2))
                         )); 
 
             if($friend == null){
