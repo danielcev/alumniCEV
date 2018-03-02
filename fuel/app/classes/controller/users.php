@@ -369,7 +369,6 @@ class Controller_Users extends Controller_Rest
             return $this->createResponse(401, 'No autorizado');
         }
 
-        
         try {
             
             $userBD = Model_Users::find($id);

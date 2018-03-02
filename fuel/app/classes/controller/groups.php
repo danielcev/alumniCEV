@@ -129,7 +129,47 @@ class Controller_Groups extends Controller_Rest
 
           $groups = Model_Groups::find('all');
 
-          $this->createResponse(200, 'Grupos devueltos', Arr::reindex($groups));
+          $this->createResponse(200, 'Grupos devueltos', array('groups' => Arr::reindex($groups)));
+    }
+
+    function get_groupsbyuser()
+    {
+
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+
+        $jwt = apache_request_headers()['Authorization'];
+
+        // validar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+
+        $id_user = $_GET['id_user'];
+
+        $belongs = Model_Belong::find('all',array(
+                'where'=>array(
+                    array('id_user',$id_user),
+                ),
+            ));
+
+        if($belongs == null){
+            return $this->createResponse(400, 'El usuario no pertenece a ningún grupo');
+        }
+
+        foreach ($belongs as $key => $belong) {
+            $groups[] = Model_Groups::find($belong->id_group);
+        }
+
+        $this->createResponse(200, 'Grupos a los que pertenece devueltos', array('groups' => Arr::reindex($groups)));
+
     }
 
     function post_assign()
