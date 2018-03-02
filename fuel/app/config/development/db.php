@@ -16,8 +16,8 @@ return array(
 	),
 );
 
-*/
 
+*/
 
 // PRODUCCION
 
