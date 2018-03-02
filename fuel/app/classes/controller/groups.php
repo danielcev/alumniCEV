@@ -49,6 +49,11 @@ class Controller_Groups extends Controller_Rest
             $groupDB = new Model_Groups();
             $groupDB->name= $name;
             $groupDB->save();
+
+            $belong = new Model_Belong(array('id_user' => 1, 'id_group' => $groupDB->id));
+
+            $belong->save();
+
             return $this->createResponse(200, 'Grupo creado');
 
         } catch (Exception $e) 

@@ -12,6 +12,9 @@ class Privacity
             'localization' => array('type' => 'bool')
 
         ), array('id'));
+
+         \DB::query("INSERT INTO `privacity` 
+            (`id`, `phone`, `localization`) VALUES (NULL, 0, 0);")->execute();
     }
 
     function down()

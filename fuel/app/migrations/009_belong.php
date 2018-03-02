@@ -37,6 +37,14 @@ class Belong
                     'on_delete' => 'CASCADE'
                 )
             ));
+
+        //Admin pertenece a todos los grupos al crearse
+        \DB::query("INSERT INTO `belong` 
+            (`id_user`, `id_group`) VALUES (1, 1);")->execute();
+        \DB::query("INSERT INTO `belong` 
+            (`id_user`, `id_group`) VALUES (1, 2);")->execute();
+        \DB::query("INSERT INTO `belong` 
+            (`id_user`, `id_group`) VALUES (1, 3);")->execute();
         
     }
 
