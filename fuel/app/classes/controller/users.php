@@ -1,6 +1,7 @@
 <?php
 //require_once '../../../vendor/autoload.php';
 use Firebase\JWT\JWT;
+
 class Controller_Users extends Controller_Rest
 {
     private $key = 'my_secret_key';
@@ -728,9 +729,11 @@ class Controller_Users extends Controller_Rest
                 ),
             )); 
 
-            if ($userBD == null) {
+            if ($userBD == null) 
+            {
                 return $this->createResponse(400, 'No existe el usuario');
             }
+            
             $friend = Model_Friends::find('first', array(
                         'where' => array(
                             array('id_user_receive', $user->data->id),
@@ -740,9 +743,9 @@ class Controller_Users extends Controller_Rest
                                 array('id_user_send', $user->data->id))
                             ),
             )); 
-            if ($friend != null) {
+            if ($friend != null) 
+            {
                 return $this->createResponse(400, 'Ya existe una petición existente entre ambos usuarios o ya sois amigos');
-            }
             }
 
             $props = array('id_user_receive' => $id_user,'id_user_send' => $user->data->id ,'state' => 1);
@@ -750,9 +753,10 @@ class Controller_Users extends Controller_Rest
             $newfriend = new Model_Friends($props);
             $newfriend->save();
 
-        return $this->createResponse(200, 'Peticion enviada',['user' => $userBD]);
+            return $this->createResponse(200, 'Peticion enviada',['user' => $userBD]);
 
-        } catch (Exception $e) 
+        } 
+        catch (Exception $e) 
         {
             return $this->createResponse(500, $e->getMessage());
         }
