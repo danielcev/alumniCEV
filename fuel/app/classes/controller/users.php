@@ -1,7 +1,6 @@
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <?php
+<?php
 //require_once '../../../vendor/autoload.php';
 use Firebase\JWT\JWT;
-
 class Controller_Users extends Controller_Rest
 {
     private $key = 'my_secret_key';
@@ -732,6 +731,19 @@ class Controller_Users extends Controller_Rest
             if ($userBD == null) {
                 return $this->createResponse(400, 'No existe el usuario');
             }
+            $friend = Model_Friends::find('first', array(
+                        'where' => array(
+                            array('id_user_receive', $user->data->id),
+                            array('id_user_send', $id_user),
+                            'or' => array(
+                                array('id_user_receive', $id_user),
+                                array('id_user_send', $user->data->id))
+                            ),
+            )); 
+            if ($friend != null) {
+                return $this->createResponse(400, 'Ya existe una petición existente entre ambos usuarios o ya sois amigos');
+            }
+            }
 
             $props = array('id_user_receive' => $id_user,'id_user_send' => $user->data->id ,'state' => 1);
 
@@ -742,10 +754,6 @@ class Controller_Users extends Controller_Rest
 
         } catch (Exception $e) 
         {
-            if($e->getCode() == 23000){
-                return $this->createResponse(400, 'Ya existe una petición existente entre ambos usuarios');
-            }
-
             return $this->createResponse(500, $e->getMessage());
         }
     }
@@ -866,7 +874,7 @@ class Controller_Users extends Controller_Rest
                                 array('id_user_send', $user->data->id),
                                 array('state',2))
                             ),
-                        )); 
+            )); 
 
             if($friend == null){
                 return $this->createResponse(400, 'No se puede dejar de seguir al usuario');
