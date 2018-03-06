@@ -268,7 +268,7 @@ class Controller_Groups extends Controller_Rest
             {
                 return $this->createResponse(400, 'El grupo no existe');
             }
-            $userDB = Model_Groups::find($id_user);
+            $userDB = Model_User::find($id_user);
             if ($userDB == null) 
             {
                 return $this->createResponse(400, 'El usuario no existe');

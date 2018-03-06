@@ -4,7 +4,6 @@
  */
 
 // LOCAL
-
 /*
 return array(
 	'default' => array(
@@ -15,7 +14,6 @@ return array(
 		),
 	),
 );
-
 */
 
 
