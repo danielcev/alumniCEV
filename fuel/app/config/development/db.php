@@ -4,6 +4,7 @@
  */
 
 // LOCAL
+
 /*
 return array(
 	'default' => array(
@@ -14,8 +15,8 @@ return array(
 		),
 	),
 );
-*/
 
+*/
 
 // PRODUCCION
 

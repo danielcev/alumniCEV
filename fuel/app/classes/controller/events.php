@@ -327,8 +327,7 @@ class Controller_Events extends Controller_Rest
                 $comment['photo'] = $userBD->photo;
             }
 
-
-            return $this->createResponse(200, 'Evento y comentarios', array('event'=>$event , 'comments'=> Arr::reindex($commentsBD)));
+            return $this->createResponse(200, 'Evento y comentarios', array('event'=>$event , 'comments'=> array_reverse(Arr::reindex($commentsBD))));
 
         } catch (Exception $e) 
         {
