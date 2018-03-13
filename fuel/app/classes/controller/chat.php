@@ -179,17 +179,36 @@ class Controller_Chat extends Controller_Rest
         }
         $user = $this->decodeToken();
 
-        // falta parametro 
+        $id_user = $user->data->id;
 
         try 
         {
+            $chats = Model_Chat::find('all', array(
+                'where' => array(
+                    array('id_user1', $id_user),
+                    'or' => array(
+                    array('id_user2', $id_user),
+                )
+                ),
+            )); 
 
-        	
-			if ($messages == null) {
-				return $this->createResponse(400, "Aun no tienes chats");
-			}
+            if(count($chats) == 0){
+                return $this->createResponse(400, "Aun no tienes chats");
+            }
 
-            return $this->createResponse(200, "Listado mensajes",$messages);
+            foreach($chats as $keyChat => $chat) {
+
+                $messagesChat = Model_Message::find('all', array(
+                    'where' => array(
+                        array('id_chat', $chat->id)
+                        )
+                ));
+
+                $chat['messages'] = $messagesChat;
+
+            }
+
+            return $this->createResponse(200, "Chats devueltos", $chats);
 
         } catch (Exception $e) 
         {
