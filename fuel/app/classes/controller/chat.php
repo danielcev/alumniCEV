@@ -198,17 +198,27 @@ class Controller_Chat extends Controller_Rest
 
             foreach($chats as $keyChat => $chat) {
 
-                $messagesChat = Model_Message::find('all', array(
+                $message= Model_Message::find('last', array(
                     'where' => array(
                         array('id_chat', $chat->id)
                         )
                 ));
 
-                $chat['messages'] = $messagesChat;
+                $chat['message'] = $message;
+
+                if($chat->id_user1 == $id_user){
+                    $idUserChat = $chat->id_user2;
+                }else{
+                    $idUserChat = $chat->id_user1;
+                }
+
+                $userChat = Model_Users::find($idUserChat);
+
+                $chat['user'] = $userChat;
 
             }
 
-            return $this->createResponse(200, "Chats devueltos", $chats);
+            return $this->createResponse(200, "Chats devueltos", array('chats' => $chats));
 
         } catch (Exception $e) 
         {
