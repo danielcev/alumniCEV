@@ -152,7 +152,9 @@ class Controller_Groups extends Controller_Rest
             return $this->createResponse(400, 'Error de autentificacion');
         }
 
-        $id_user = $_GET['id_user'];
+        $user = $this->decodeToken();
+
+        $id_user = $user->data->id;
 
         $belongs = Model_Belong::find('all',array(
                 'where'=>array(
