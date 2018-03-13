@@ -261,11 +261,11 @@ class Controller_Chat extends Controller_Rest
 
                 $chat = Model_Chat::find('first', array(
                     'where' => array(
-                        array('id_user1', $user["id"]),
+                        array('id_user1', $user->id),
                         array('id_user2', $id_user),
                         'or' => array(
                             array('id_user2', $id_user),
-                            array('id_user1', $user["id"]))
+                            array('id_user1', $user->id))
                         ),
                 ));
 
