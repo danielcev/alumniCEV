@@ -165,8 +165,24 @@ class Controller_Groups extends Controller_Rest
         }
 
         foreach ($belongs as $key => $belong) {
-            $groups[] = Model_Groups::find($belong->id_group);
+            $group = Model_Groups::find($belong->id_group);
+            $groups[] = $group;
         }
+
+        foreach ($groups as $key => $group) {
+            $belongsGroup = Model_Belong::find('all',array(
+                'where'=>array(
+                    array('id_group',$group->id),
+                ),
+            ));
+
+            foreach ($belongsGroup as $key => $belongGroup) {
+                $usersGroup[] = Model_Users::find($belongGroup->id_user);
+            }
+
+            $group['users'] = $usersGroup;
+        }
+        
 
         $this->createResponse(200, 'Grupos a los que pertenece devueltos', array('groups' => Arr::reindex($groups)));
 
