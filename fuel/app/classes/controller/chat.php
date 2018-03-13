@@ -226,7 +226,7 @@ class Controller_Chat extends Controller_Rest
         }
     }
 
-    function getuserstochat(){
+    function get_userstochat(){
         try{
             // falta token
             if (!isset(apache_request_headers()['Authorization']))
