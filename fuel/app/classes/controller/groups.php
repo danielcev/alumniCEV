@@ -183,6 +183,8 @@ class Controller_Groups extends Controller_Rest
             }
 
             $group['users'] = $usersGroup;
+
+            $usersGroup = [];
         }
         
 
