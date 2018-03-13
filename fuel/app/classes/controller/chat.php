@@ -146,7 +146,7 @@ class Controller_Chat extends Controller_Rest
 					    'where' => array(
 					        array('id_chat', $id_chat),
 					    ),
-					    'order_by' => array('id' => 'desc'),
+					    'order_by' => array('id' => 'asc'),
 			));
 
 			if ($messages == null) {
