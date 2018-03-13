@@ -226,6 +226,66 @@ class Controller_Chat extends Controller_Rest
         }
     }
 
+    function getuserstochat(){
+        try{
+            // falta token
+            if (!isset(apache_request_headers()['Authorization']))
+            {
+                return $this->createResponse(400, 'Token no encontrado');
+            }
+            $jwt = apache_request_headers()['Authorization'];
+            // valdiar token
+            try {
+
+                $this->validateToken($jwt);
+            } catch (Exception $e) {
+
+                //return $this->createResponse(400, 'Error de autentificacion');
+            }
+            $user = $this->decodeToken();
+
+            $id_user = $user->data->id;
+
+            $friendUsers = \DB::query('SELECT * FROM users
+                                        JOIN friend ON friend.id_user_send = '.$id.'
+                                        AND users.id = friend.id_user_receive
+                                        WHERE friend.state = 2
+                                        UNION 
+                                        SELECT * FROM users
+                                        JOIN friend ON friend.id_user_receive = '.$id.'
+                                        AND users.id = friend.id_user_send
+                                        WHERE friend.state = 2
+                                        ')->as_assoc()->execute();
+
+            foreach($friendUsers as $key => $user) {
+
+                $chat = Model_Chat::find('first', array(
+                    'where' => array(
+                        array('id_user1', $user["id"]),
+                        array('id_user2', $id_user),
+                        'or' => array(
+                            array('id_user2', $id_user),
+                            array('id_user1', $user["id"]))
+                        ),
+                ));
+
+                if($chat == null){
+                    $usersToChat[] = $user;
+                }
+
+            }
+
+            if(!isset($usersToChat)){
+                return $this->createResponse(200, "No hay usuarios amigos con los que crear chat");
+            }
+
+            return $this->createResponse(200, "Usuarios amigos con los que abrir chat devueltos", array('users' => $usersToChat));
+
+        }catch(Exception $e){
+            return $this->createResponse(500, $e->getMessage());
+        }
+    }
+
     function createResponse($code, $message, $data = [])
     {
 
