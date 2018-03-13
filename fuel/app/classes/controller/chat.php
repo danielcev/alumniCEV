@@ -153,7 +153,7 @@ class Controller_Chat extends Controller_Rest
 				return $this->createResponse(400, "Aun no tienes mensajes en este chat");
 			}
 
-            return $this->createResponse(200, "Listado mensajes",$messages);
+            return $this->createResponse(200, "Listado mensajes",array('messages' => Arr::reindex($messages)));
 
         } catch (Exception $e) 
         {
@@ -256,6 +256,8 @@ class Controller_Chat extends Controller_Rest
                                         AND users.id = friend.id_user_send
                                         WHERE friend.state = 2
                                         ')->as_assoc()->execute();
+
+                                        
 
             foreach($friendUsers as $key => $user) {
 
