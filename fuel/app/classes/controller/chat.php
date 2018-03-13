@@ -218,7 +218,7 @@ class Controller_Chat extends Controller_Rest
 
             }
 
-            return $this->createResponse(200, "Chats devueltos", array('chats' => $chats));
+            return $this->createResponse(200, "Chats devueltos", array('chats' => Arr::reindex($chats)));
 
         } catch (Exception $e) 
         {
