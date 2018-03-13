@@ -247,12 +247,12 @@ class Controller_Chat extends Controller_Rest
             $id_user = $user->data->id;
 
             $friendUsers = \DB::query('SELECT * FROM users
-                                        JOIN friend ON friend.id_user_send = '.$id.'
+                                        JOIN friend ON friend.id_user_send = '.$id_user.'
                                         AND users.id = friend.id_user_receive
                                         WHERE friend.state = 2
                                         UNION 
                                         SELECT * FROM users
-                                        JOIN friend ON friend.id_user_receive = '.$id.'
+                                        JOIN friend ON friend.id_user_receive = '.$id_user.'
                                         AND users.id = friend.id_user_send
                                         WHERE friend.state = 2
                                         ')->as_assoc()->execute();
