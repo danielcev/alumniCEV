@@ -257,21 +257,22 @@ class Controller_Chat extends Controller_Rest
                                         WHERE friend.state = 2
                                         ')->as_assoc()->execute();
 
-                                        
+            foreach($friendUsers as $key => $user) {   
 
-            foreach($friendUsers as $key => $user) {
-
-                $chat = Model_Chat::find('first', array(
+                $chat1 = Model_Chat::find('first', array(
                     'where' => array(
-                        array('id_user1', $user->id),
-                        array('id_user2', $id_user),
-                        'or' => array(
-                            array('id_user2', $id_user),
-                            array('id_user1', $user->id))
-                        ),
-                ));
+                        array('id_user1', $user["id"]),
+                        array('id_user2', $id_user)  
+                )));
 
-                if($chat == null){
+                $chat2 = Model_Chat::find('first', array(
+                    'where' => array(
+                        array('id_user2', $user["id"]),
+                        array('id_user1', $id_user)  
+                )));
+
+
+                if($chat1 == null && $chat2 == null){
                     $usersToChat[] = $user;
                 }
 
