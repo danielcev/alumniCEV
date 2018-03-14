@@ -187,7 +187,7 @@ class Controller_Groups extends Controller_Rest
 
                 $usersGroup[] = Model_Users::find($belongGroup->id_user);
 
-            ));
+            // ));
 
                 
             }
