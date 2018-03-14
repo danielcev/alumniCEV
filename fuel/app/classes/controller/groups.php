@@ -179,11 +179,14 @@ class Controller_Groups extends Controller_Rest
             ));
 
             foreach ($belongsGroup as $key => $belongGroup) {
-                $usersGroup[] = Model_Users::find('first',array(
-                'where'=>array(
-                    array('id',$belongGroup->id_user),
-                    array('is_registered', 1)
-                ),
+                // $usersGroup[] = Model_Users::find('first',array(
+                // 'where'=>array(
+                //     array('id',$belongGroup->id_user),
+                //     array('is_registered', 1)
+                // ),
+
+                $usersGroup[] = Model_Users::find($belongGroup->id_user);
+
             ));
 
                 
