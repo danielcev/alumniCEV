@@ -182,7 +182,7 @@ class Controller_Groups extends Controller_Rest
                 $usersGroup[] = Model_Users::find('first',array(
                 'where'=>array(
                     array('id',$belongGroup->id_user),
-                    array('is_registed', 1)
+                    array('is_registered', 1)
                 ),
             ));
 
