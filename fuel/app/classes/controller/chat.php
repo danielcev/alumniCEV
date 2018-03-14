@@ -52,7 +52,7 @@ class Controller_Chat extends Controller_Rest
 
             $newChat = new Model_Chat($props);
             $newChat->save();
-            return $this->createResponse(200, "Chat creado con exito");
+            return $this->createResponse(200, "Chat creado con exito", array('chat' => $chat));
 
         } catch (Exception $e) 
         {
