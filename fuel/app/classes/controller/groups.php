@@ -222,7 +222,7 @@ class Controller_Groups extends Controller_Rest
             return $this->createResponse(400, 'Error de autentificacion');
         }
 
-        $id_user = $_POST['id_user'];
+        $id_user = $_GET['id_user'];
 
 
         $belongs = Model_Belong::find('all',array(
