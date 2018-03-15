@@ -202,6 +202,75 @@ class Controller_Groups extends Controller_Rest
 
     }
 
+    function get_groupsbyuserCliente()
+    {
+
+        // falta token
+        if (!isset(apache_request_headers()['Authorization']))
+        {
+            return $this->createResponse(400, 'Token no encontrado');
+        }
+
+        $jwt = apache_request_headers()['Authorization'];
+
+        // validar token
+        try {
+
+            $this->validateToken($jwt);
+        } catch (Exception $e) {
+
+            return $this->createResponse(400, 'Error de autentificacion');
+        }
+
+        $id_user = $_POST['id_user'];
+
+
+        $belongs = Model_Belong::find('all',array(
+                'where'=>array(
+                    array('id_user',$id_user),
+                ),
+            ));
+
+        if($belongs == null){
+            return $this->createResponse(400, 'El usuario no pertenece a ningún grupo');
+        }
+
+        foreach ($belongs as $key => $belong) {
+            $group = Model_Groups::find($belong->id_group);
+            $groups[] = $group;
+        }
+
+        foreach ($groups as $key => $group) {
+            $belongsGroup = Model_Belong::find('all',array(
+                'where'=>array(
+                    array('id_group',$group->id),
+                ),
+            ));
+
+            foreach ($belongsGroup as $key => $belongGroup) {
+                 $userGroup = Model_Users::find('first',array(
+                'where'=>array(
+                    array('id',$belongGroup->id_user),
+                    array('is_registered', 1)
+                ),
+                ));
+
+                if($userGroup != null){
+                    $usersGroup[] = $userGroup;
+                }
+
+            }
+
+            $group['users'] = $usersGroup;
+
+            $usersGroup = [];
+        }
+        
+
+        $this->createResponse(200, 'Grupos a los que pertenece devueltos', array('groups' => Arr::reindex($groups)));
+
+    }
+
     function post_assign()
     {
     	if (!isset(apache_request_headers()['Authorization']))
